@@ -38,6 +38,7 @@ namespace AguasSetubal
             // Configuração do Identity para autenticação e autorização
             services.AddDefaultIdentity<IdentityUser>(options =>
                 options.SignIn.RequireConfirmedAccount = true)
+                .AddRoles<IdentityRole>()  // Adiciona suporte a roles (funções)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             // Adiciona suporte para controllers e views
@@ -48,7 +49,7 @@ namespace AguasSetubal
         }
 
         // Este método é chamado pelo runtime. Use este método para configurar o pipeline de requisições HTTP.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -77,7 +78,52 @@ namespace AguasSetubal
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages(); // Mapeia as Razor Pages
             });
+
+            // Chama o método para criar as roles e um utilizador admin por defeito
+            CreateRoles(serviceProvider).Wait();
+        }
+
+        private async Task CreateRoles(IServiceProvider serviceProvider)
+        {
+            // Obtenção dos serviços necessários
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+            // Definindo os nomes das roles
+            string[] roleNames = { "Admin", "Funcionario", "Cliente", "Anonimo" };
+            IdentityResult roleResult;
+
+            foreach (var roleName in roleNames)
+            {
+                // Verifica se a role já existe, e se não, cria ela
+                var roleExist = await roleManager.RoleExistsAsync(roleName);
+                if (!roleExist)
+                {
+                    roleResult = await roleManager.CreateAsync(new IdentityRole(roleName));
+                }
+            }
+
+            // Criação de um utilizador Admin por defeito
+            var powerUser = new IdentityUser
+            {
+                UserName = "admin@exemplo.com",
+                Email = "admin@exemplo.com",
+            };
+
+            string userPassword = "Admin@123";
+            var user = await userManager.FindByEmailAsync("admin@exemplo.com");
+
+            if (user == null)
+            {
+                var createPowerUser = await userManager.CreateAsync(powerUser, userPassword);
+                if (createPowerUser.Succeeded)
+                {
+                    // Atribui a role de Admin ao utilizador criado
+                    await userManager.AddToRoleAsync(powerUser, "Admin");
+                }
+            }
         }
     }
 }
+
 

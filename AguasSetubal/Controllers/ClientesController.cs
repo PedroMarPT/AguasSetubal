@@ -7,9 +7,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AguasSetubal.Data;
 using AguasSetubal.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AguasSetubal.Controllers
 {
+   // [Authorize(Roles = "Admin, Funcionario")] // Restringe o acesso ao controlador ClientesController 
+    //apenas aos utilizadores que têm as roles Admin ou Funcionario.
     public class ClientesController : Controller
     {
         private readonly ApplicationDbContext _context;
