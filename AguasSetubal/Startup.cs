@@ -42,6 +42,9 @@ namespace AguasSetubal
 
             // Adiciona suporte para controllers e views
             services.AddControllersWithViews();
+
+            // Adiciona suporte para Razor Pages
+            services.AddRazorPages();
         }
 
         // Este método é chamado pelo runtime. Use este método para configurar o pipeline de requisições HTTP.
