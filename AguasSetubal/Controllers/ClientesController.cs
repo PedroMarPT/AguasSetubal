@@ -67,6 +67,13 @@ namespace AguasSetubal.Controllers
             }
             return View(cliente);
         }
+        //public IActionResult Index()
+        //{
+        //    var clientes = _context.Clientes.ToList(); // Obtém os clientes do banco de dados
+        //    ViewBag.Clientes = clientes; // Passa os dados para a View
+        //    return View();
+        //}
+
 
         // GET: Clientes/Edit/5
         public async Task<IActionResult> Edit(int? id)

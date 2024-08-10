@@ -13,6 +13,10 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.17" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.17" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
+    <PackageReference Include="Syncfusion.AspNet.Mvc5" Version="20.4.0.44" />
+    <PackageReference Include="Syncfusion.Blazor" Version="26.2.8" />
+    <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="26.2.8" />
+    <PackageReference Include="Syncfusion.EJ2.MVC5" Version="26.2.8" />
   </ItemGroup>
 
 </Project>

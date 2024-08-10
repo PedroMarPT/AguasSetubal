@@ -1,0 +1,18 @@
+﻿@using Syncfusion.EJ2.Grids
+
+@{
+    ViewBag.Title = "Gestão de Clientes";
+}
+
+<div class="container">
+    <h2>Gestão de Clientes</h2>
+    <ejs-grid id="Grid" dataSource="@(ViewBag.Clientes)" allowPaging="true" allowSorting="true">
+        <e-grid-columns>
+            <e-grid-column field="ClienteId" headerText="ID" textAlign="Right" width="120"></e-grid-column>
+            <e-grid-column field="Nome" headerText="Nome" width="150"></e-grid-column>
+            <e-grid-column field="Email" headerText="Email" width="150"></e-grid-column>
+            <e-grid-column field="Telefone" headerText="Telefone" width="150"></e-grid-column>
+        </e-grid-columns>
+    </ejs-grid>
+</div>
+

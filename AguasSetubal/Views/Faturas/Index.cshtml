@@ -1,0 +1,37 @@
+﻿@model IEnumerable<AguasSetubal.Models.Fatura>
+
+@{
+    ViewBag.Title = "Gestão de Faturas";
+}
+
+<h2>Gestão de Faturas</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Valor</th>
+            <th>Cliente</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var fatura in Model)
+        {
+            <tr>
+                <td>@fatura.Data.ToShortDateString()</td>
+                <td>@fatura.Valor</td>
+                <td>@fatura.Cliente.Nome</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@fatura.Id">Editar</a> |
+                    <a asp-action="Details" asp-route-id="@fatura.Id">Detalhes</a> |
+                    <a asp-action="Delete" asp-route-id="@fatura.Id">Excluir</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Criar Nova Fatura</a>
+</p>

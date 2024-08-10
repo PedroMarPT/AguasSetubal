@@ -1,16 +1,12 @@
 using AguasSetubal.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AguasSetubal
@@ -37,9 +33,15 @@ namespace AguasSetubal
 
             // Configuração do Identity para autenticação e autorização
             services.AddDefaultIdentity<IdentityUser>(options =>
-                options.SignIn.RequireConfirmedAccount = true)
-                .AddRoles<IdentityRole>()  // Adiciona suporte a roles (funções)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            {
+                options.Password.RequireDigit = true; // Requer um número
+                options.Password.RequireLowercase = true; // Requer uma letra minúscula
+                options.Password.RequireNonAlphanumeric = false; // Não requer caractere especial
+                options.Password.RequireUppercase = true; // Requer uma letra maiúscula
+                options.Password.RequiredLength = 6; // Mínimo de 6 caracteres
+            })
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<ApplicationDbContext>();
 
             // Adiciona suporte para controllers e views
             services.AddControllersWithViews();
@@ -110,12 +112,12 @@ namespace AguasSetubal
                 Email = "admin@exemplo.com",
             };
 
-            string userPassword = "Admin@123";
+            string adminPassword = "Admin@123";
             var user = await userManager.FindByEmailAsync("admin@exemplo.com");
 
             if (user == null)
             {
-                var createPowerUser = await userManager.CreateAsync(powerUser, userPassword);
+                var createPowerUser = await userManager.CreateAsync(powerUser, adminPassword);
                 if (createPowerUser.Succeeded)
                 {
                     // Atribui a role de Admin ao utilizador criado
