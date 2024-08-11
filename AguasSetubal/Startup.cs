@@ -20,7 +20,7 @@ namespace AguasSetubal
 
         public IConfiguration Configuration { get; }
 
-        // Este método é chamado pelo runtime. Use este método para adicionar serviços ao contêiner.
+        // Método para adicionar serviços ao contêiner
         public void ConfigureServices(IServiceCollection services)
         {
             // Registro do DbContext com a string de conexão
@@ -50,7 +50,7 @@ namespace AguasSetubal
             services.AddRazorPages();
         }
 
-        // Este método é chamado pelo runtime. Use este método para configurar o pipeline de requisições HTTP.
+        // Método para configurar o pipeline de requisições HTTP
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
@@ -60,7 +60,8 @@ namespace AguasSetubal
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Home/Error"); // Redireciona para a página de erro em produção
+                app.UseStatusCodePagesWithReExecute("/Home/NotFound");
                 app.UseHsts(); // Força o uso de HTTPS em produção
             }
 
@@ -85,9 +86,9 @@ namespace AguasSetubal
             CreateRoles(serviceProvider).Wait();
         }
 
+        // Método para criar roles e um usuário administrador padrão
         private async Task CreateRoles(IServiceProvider serviceProvider)
         {
-            // Obtenção dos serviços necessários
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
@@ -97,7 +98,6 @@ namespace AguasSetubal
 
             foreach (var roleName in roleNames)
             {
-                // Verifica se a role já existe, e se não, cria ela
                 var roleExist = await roleManager.RoleExistsAsync(roleName);
                 if (!roleExist)
                 {
@@ -127,5 +127,6 @@ namespace AguasSetubal
         }
     }
 }
+
 
 

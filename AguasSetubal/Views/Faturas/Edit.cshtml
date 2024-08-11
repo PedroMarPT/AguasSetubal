@@ -1,0 +1,27 @@
+﻿@model AguasSetubal.Models.Fatura
+
+<h1>Edit Fatura</h1>
+
+<h4>Fatura</h4>
+<hr />
+<div>
+    <form asp-action="Edit">
+        <div class="form-group">
+            <label asp-for="ClienteId" class="control-label">Cliente</label>
+            <select asp-for="ClienteId" class="form-control" asp-items="ViewBag.Clientes"></select>
+        </div>
+        <div class="form-group">
+            <label asp-for="Valor" class="control-label">Valor</label>
+            <input asp-for="Valor" class="form-control" />
+        </div>
+        <!-- Outros campos da fatura que você deseja editar -->
+        <div class="form-group">
+            <input type="submit" value="Save" class="btn btn-primary" />
+        </div>
+    </form>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

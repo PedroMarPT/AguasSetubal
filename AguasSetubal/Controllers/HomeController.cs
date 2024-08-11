@@ -1,11 +1,7 @@
 ﻿using AguasSetubal.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AguasSetubal.Controllers
 {
@@ -28,10 +24,24 @@ namespace AguasSetubal.Controllers
             return View();
         }
 
+        // Método que lida com erros
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        // Método para lidar com erros 404 (Página Não Encontrada)
+        public IActionResult NotFound()
+        {
+            return View();
+        }
+
+        // Método para lidar com erros 403 (Acesso Negado)
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
     }
 }
+
