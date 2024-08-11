@@ -19,14 +19,39 @@
                 <span asp-validation-for="Nome" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Endereco" class="control-label"></label>
-                <input asp-for="Endereco" class="form-control" />
-                <span asp-validation-for="Endereco" class="text-danger"></span>
+                <label asp-for="Morada" class="control-label"></label>
+                <input asp-for="Morada" class="form-control" />
+                <span asp-validation-for="Morada" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NumeroCartaoCidadao" class="control-label"></label>
+                <input asp-for="NumeroCartaoCidadao" class="form-control" />
+                <span asp-validation-for="NumeroCartaoCidadao" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NIF" class="control-label"></label>
+                <input asp-for="NIF" class="form-control" />
+                <span asp-validation-for="NIF" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ContactoTelefonico" class="control-label"></label>
+                <input asp-for="ContactoTelefonico" class="form-control" />
+                <span asp-validation-for="ContactoTelefonico" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="NumeroContrato" class="control-label"></label>
                 <input asp-for="NumeroContrato" class="form-control" />
                 <span asp-validation-for="NumeroContrato" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NumeroContador" class="control-label"></label>
+                <input asp-for="NumeroContador" class="form-control" />
+                <span asp-validation-for="NumeroContador" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LeituraAtualContador" class="control-label"></label>
+                <input asp-for="LeituraAtualContador" class="form-control" />
+                <span asp-validation-for="LeituraAtualContador" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
@@ -40,5 +65,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

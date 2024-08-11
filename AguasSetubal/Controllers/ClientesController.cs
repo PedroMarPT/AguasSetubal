@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AguasSetubal.Data;
 using AguasSetubal.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace AguasSetubal.Controllers
 {
-   // [Authorize(Roles = "Admin, Funcionario")] // Restringe o acesso ao controlador ClientesController 
-    //apenas aos utilizadores que têm as roles Admin ou Funcionario.
     public class ClientesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -36,8 +31,7 @@ namespace AguasSetubal.Controllers
                 return NotFound();
             }
 
-            var cliente = await _context.Clientes
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var cliente = await _context.Clientes.FirstOrDefaultAsync(m => m.Id == id);
             if (cliente == null)
             {
                 return NotFound();
@@ -53,11 +47,9 @@ namespace AguasSetubal.Controllers
         }
 
         // POST: Clientes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Endereco,NumeroContrato")] Cliente cliente)
+        public async Task<IActionResult> Create([Bind("Nome,Morada,NumeroCartaoCidadao,NIF,ContactoTelefonico,NumeroContrato,NumeroContador,LeituraAtualContador")] Cliente cliente)
         {
             if (ModelState.IsValid)
             {
@@ -67,13 +59,6 @@ namespace AguasSetubal.Controllers
             }
             return View(cliente);
         }
-        //public IActionResult Index()
-        //{
-        //    var clientes = _context.Clientes.ToList(); // Obtém os clientes do banco de dados
-        //    ViewBag.Clientes = clientes; // Passa os dados para a View
-        //    return View();
-        //}
-
 
         // GET: Clientes/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -92,11 +77,9 @@ namespace AguasSetubal.Controllers
         }
 
         // POST: Clientes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Endereco,NumeroContrato")] Cliente cliente)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Morada,NumeroCartaoCidadao,NIF,ContactoTelefonico,NumeroContrato,NumeroContador,LeituraAtualContador")] Cliente cliente)
         {
             if (id != cliente.Id)
             {
@@ -134,8 +117,7 @@ namespace AguasSetubal.Controllers
                 return NotFound();
             }
 
-            var cliente = await _context.Clientes
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var cliente = await _context.Clientes.FirstOrDefaultAsync(m => m.Id == id);
             if (cliente == null)
             {
                 return NotFound();
@@ -161,3 +143,4 @@ namespace AguasSetubal.Controllers
         }
     }
 }
+
