@@ -10,6 +10,8 @@ namespace AguasSetubal.Models
         [StringLength(100)]
         public string Nome { get; set; }  // Nome do Cliente
 
+        public string Endereco { get; set; }  // Endereço 
+
         [Required]
         [StringLength(200)]
         public string Morada { get; set; }  // Morada do Cliente

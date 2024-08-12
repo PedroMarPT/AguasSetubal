@@ -1,0 +1,27 @@
+﻿@model AguasSetubal.Models.LeituraContador
+
+@{
+    ViewData["Title"] = "Nova Leitura";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<h4>Dados do Cliente</h4>
+<hr />
+<div>
+    <p><strong>Cliente:</strong> @Model.Cliente.Nome</p>
+    <p><strong>Leitura Anterior:</strong> @Model.LeituraAnterior m³</p>
+</div>
+
+<form asp-action="Create">
+    <div class="form-group">
+        <label asp-for="Valor" class="control-label">Leitura Atual (m³)</label>
+        <input asp-for="Valor" class="form-control" />
+        <span asp-validation-for="Valor" class="text-danger"></span>
+    </div>
+
+    <input type="hidden" asp-for="ClienteId" />
+
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

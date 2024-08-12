@@ -4,14 +4,16 @@ using AguasSetubal.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AguasSetubal.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240812074555_AdjustDecimalPrecision")]
+    partial class AdjustDecimalPrecision
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,7 +90,7 @@ namespace AguasSetubal.Data.Migrations
                     b.Property<string>("Endereco")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("LeituraContadorId")
+                    b.Property<int>("LeituraContadorId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("ValorTotal")
@@ -345,7 +347,9 @@ namespace AguasSetubal.Data.Migrations
 
                     b.HasOne("AguasSetubal.Models.LeituraContador", "LeituraContador")
                         .WithMany()
-                        .HasForeignKey("LeituraContadorId");
+                        .HasForeignKey("LeituraContadorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Cliente");
 

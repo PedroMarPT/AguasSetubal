@@ -2,8 +2,8 @@
 using AguasSetubal.Data;
 using AguasSetubal.Models;
 using Microsoft.AspNetCore.Mvc.Rendering; // Para usar SelectList
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace AguasSetubal.Controllers
 {
@@ -19,7 +19,6 @@ namespace AguasSetubal.Controllers
         // GET: Faturas
         public IActionResult Index()
         {
-            // Inclua o cliente na consulta para exibir informações sobre o cliente na lista de faturas
             var faturas = _context.Faturas.Include(f => f.Cliente).ToList();
             return View(faturas);
         }
@@ -27,7 +26,7 @@ namespace AguasSetubal.Controllers
         // GET: Faturas/Create
         public IActionResult Create()
         {
-            // Passa a lista de clientes para a View, para popular o dropdown
+            // Carregar a lista de clientes para o dropdown
             ViewBag.Clientes = new SelectList(_context.Clientes, "Id", "Nome");
             return View();
         }
@@ -39,12 +38,20 @@ namespace AguasSetubal.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Faturas.Add(fatura);
-                _context.SaveChanges();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Faturas.Add(fatura);
+                    _context.SaveChanges();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException ex)
+                {
+                    // Tratar exceção de atualização do banco de dados
+                    ModelState.AddModelError("", $"Erro ao criar a fatura: {ex.Message}");
+                }
             }
 
-            // Se o ModelState não for válido, precisamos repopular o ViewBag.Clientes
+            // Repopular o ViewBag.Clientes em caso de erro
             ViewBag.Clientes = new SelectList(_context.Clientes, "Id", "Nome", fatura.ClienteId);
             return View(fatura);
         }
@@ -63,7 +70,7 @@ namespace AguasSetubal.Controllers
                 return NotFound();
             }
 
-            // Passa a lista de clientes para a View, para popular o dropdown
+            // Carregar a lista de clientes para o dropdown
             ViewBag.Clientes = new SelectList(_context.Clientes, "Id", "Nome", fatura.ClienteId);
             return View(fatura);
         }
@@ -96,10 +103,15 @@ namespace AguasSetubal.Controllers
                         throw;
                     }
                 }
+                catch (DbUpdateException ex)
+                {
+                    // Tratar exceção de atualização do banco de dados
+                    ModelState.AddModelError("", $"Erro ao atualizar a fatura: {ex.Message}");
+                }
                 return RedirectToAction(nameof(Index));
             }
 
-            // Se o ModelState não for válido, precisamos repopular o ViewBag.Clientes
+            // Repopular o ViewBag.Clientes em caso de erro
             ViewBag.Clientes = new SelectList(_context.Clientes, "Id", "Nome", fatura.ClienteId);
             return View(fatura);
         }
@@ -115,6 +127,7 @@ namespace AguasSetubal.Controllers
             var fatura = _context.Faturas
                 .Include(f => f.Cliente)
                 .FirstOrDefault(m => m.Id == id);
+
             if (fatura == null)
             {
                 return NotFound();
@@ -134,6 +147,7 @@ namespace AguasSetubal.Controllers
             var fatura = _context.Faturas
                 .Include(f => f.Cliente)
                 .FirstOrDefault(m => m.Id == id);
+
             if (fatura == null)
             {
                 return NotFound();
@@ -148,12 +162,27 @@ namespace AguasSetubal.Controllers
         public IActionResult DeleteConfirmed(int id)
         {
             var fatura = _context.Faturas.Find(id);
-            _context.Faturas.Remove(fatura);
-            _context.SaveChanges();
+
+            if (fatura == null)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                _context.Faturas.Remove(fatura);
+                _context.SaveChanges();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Tratar exceção de atualização do banco de dados
+                ModelState.AddModelError("", $"Erro ao excluir a fatura: {ex.Message}");
+                return View(fatura);
+            }
+
             return RedirectToAction(nameof(Index));
         }
     }
 }
-
 
 

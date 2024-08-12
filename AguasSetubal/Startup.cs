@@ -1,4 +1,5 @@
 using AguasSetubal.Data;
+using AguasSetubal.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -8,6 +9,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity.UI.Services;
+
+
+
 
 namespace AguasSetubal
 {
@@ -34,14 +39,17 @@ namespace AguasSetubal
             // Configuração do Identity para autenticação e autorização
             services.AddDefaultIdentity<IdentityUser>(options =>
             {
-                options.Password.RequireDigit = true; // Requer um número
-                options.Password.RequireLowercase = true; // Requer uma letra minúscula
-                options.Password.RequireNonAlphanumeric = false; // Não requer caractere especial
-                options.Password.RequireUppercase = true; // Requer uma letra maiúscula
-                options.Password.RequiredLength = 6; // Mínimo de 6 caracteres
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = true;
+                options.Password.RequiredLength = 6;
             })
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            // Registrar o EmailSender do seu projeto
+            services.AddTransient<AguasSetubal.Services.IEmailSender, AguasSetubal.Services.EmailSender>();
 
             // Adiciona suporte para controllers e views
             services.AddControllersWithViews();

@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using YourNamespace.ViewModels;
 using System.Threading.Tasks;
 using System;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal;
+using AguasSetubal.Services;
+
 
 namespace YourNamespace.Controllers
 {
@@ -10,12 +14,15 @@ namespace YourNamespace.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly AguasSetubal.Services.IEmailSender _emailSender;  // Usando o IEmailSender do seu projeto
 
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, AguasSetubal.Services.IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _emailSender = emailSender;
         }
+
 
         [HttpGet]
         public IActionResult Register()
@@ -89,17 +96,41 @@ namespace YourNamespace.Controllers
                 var user = await _userManager.FindByEmailAsync(model.Email);
                 if (user == null)
                 {
-                    return RedirectToAction("ForgotPasswordConfirmation");
+                    // Não revelar se o usuário não existe
+                    return RedirectToAction(nameof(ForgotPasswordConfirmation));
                 }
 
-                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var callbackUrl = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
-                // Enviar o email com o link de recuperação
-                return RedirectToAction("ForgotPasswordConfirmation");
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var callbackUrl = Url.Action(nameof(ResetPassword), "Account", new { token, email = user.Email }, Request.Scheme);
+
+                await _emailSender.SendEmailAsync(
+                    model.Email,
+                    "Redefinir Senha",
+                    $"Por favor, redefina sua senha clicando aqui: <a href='{callbackUrl}'>link</a>");
+
+                return RedirectToAction(nameof(ForgotPasswordConfirmation));
             }
 
             return View(model);
         }
+        //public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        var user = await _userManager.FindByEmailAsync(model.Email);
+        //        if (user == null)
+        //        {
+        //            return RedirectToAction("ForgotPasswordConfirmation");
+        //        }
+
+        //        var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+        //        var callbackUrl = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
+        //        // Enviar o email com o link de recuperação
+        //        return RedirectToAction("ForgotPasswordConfirmation");
+        //    }
+
+        //    return View(model);
+        //}
 
         [HttpGet]
         public IActionResult ResetPassword(string code = null)
