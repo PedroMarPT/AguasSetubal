@@ -1,5 +1,9 @@
 ﻿@model AguasSetubal.Models.Fatura
 
+@{
+    ViewData["Title"] = "Detalhes da Fatura";
+}
+
 <h1>Detalhes da Fatura</h1>
 
 <div>
@@ -7,38 +11,46 @@
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            Nome do Cliente
+            @Html.DisplayNameFor(model => model.Cliente.Nome)
         </dt>
         <dd class="col-sm-10">
-            @Model.Cliente.Nome
+            @Html.DisplayFor(model => model.Cliente.Nome)
         </dd>
         <dt class="col-sm-2">
-            Endereço
+            @Html.DisplayNameFor(model => model.LeituraContador.LeituraAnterior)
         </dt>
         <dd class="col-sm-10">
-            @Model.Cliente.Endereco
+            @Html.DisplayFor(model => model.LeituraContador.LeituraAnterior)
         </dd>
         <dt class="col-sm-2">
-            Data da Fatura
+            @Html.DisplayNameFor(model => model.LeituraContador.LeituraAtual)
         </dt>
         <dd class="col-sm-10">
-            @Model.DataEmissao.ToString("dd/MM/yyyy")
+            @Html.DisplayFor(model => model.LeituraContador.LeituraAtual)
         </dd>
         <dt class="col-sm-2">
-            Consumo de Água (m³)
+            @Html.DisplayNameFor(model => model.LeituraContador.Consumo)
         </dt>
         <dd class="col-sm-10">
-            @Model.LeituraContador.Consumo m³
+            @Html.DisplayFor(model => model.LeituraContador.Consumo)
         </dd>
         <dt class="col-sm-2">
-            Valor Total (€)
+            @Html.DisplayNameFor(model => model.DataEmissao)
         </dt>
         <dd class="col-sm-10">
-            @Model.ValorTotal.ToString("C")
+            @Html.DisplayFor(model => model.DataEmissao)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Endereco)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Endereco)
         </dd>
     </dl>
 </div>
 <div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Editar</a> |
     <a asp-action="Index">Voltar à Lista</a>
 </div>
+
 

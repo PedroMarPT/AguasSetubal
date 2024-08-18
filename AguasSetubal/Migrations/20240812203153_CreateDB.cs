@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace AguasSetubal.Data.Migrations
+namespace AguasSetubal.Migrations
 {
-    public partial class AddIdentitySupport : Migration
+    public partial class CreateDB : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -44,6 +44,27 @@ namespace AguasSetubal.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Clientes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Endereco = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Morada = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    NumeroCartaoCidadao = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    NIF = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
+                    ContactoTelefonico = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
+                    NumeroContrato = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    NumeroContador = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    LeituraAtualContador = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Clientes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -152,6 +173,60 @@ namespace AguasSetubal.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "LeituraContadores",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DataLeitura = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Valor = table.Column<int>(type: "int", nullable: false),
+                    ClienteId = table.Column<int>(type: "int", nullable: false),
+                    DataLeituraAnterior = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LeituraAnterior = table.Column<int>(type: "int", nullable: false),
+                    ValorPagar = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LeituraContadores", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LeituraContadores_Clientes_ClienteId",
+                        column: x => x.ClienteId,
+                        principalTable: "Clientes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Faturas",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClienteId = table.Column<int>(type: "int", nullable: false),
+                    DataEmissao = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LeituraContadorId = table.Column<int>(type: "int", nullable: false),
+                    ValorTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Endereco = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Faturas", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Faturas_Clientes_ClienteId",
+                        column: x => x.ClienteId,
+                        principalTable: "Clientes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Faturas_LeituraContadores_LeituraContadorId",
+                        column: x => x.LeituraContadorId,
+                        principalTable: "LeituraContadores",
+                        principalColumn: "Id",
+                       // onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -190,6 +265,21 @@ namespace AguasSetubal.Data.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Faturas_ClienteId",
+                table: "Faturas",
+                column: "ClienteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Faturas_LeituraContadorId",
+                table: "Faturas",
+                column: "LeituraContadorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LeituraContadores_ClienteId",
+                table: "LeituraContadores",
+                column: "ClienteId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -210,10 +300,19 @@ namespace AguasSetubal.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Faturas");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "LeituraContadores");
+
+            migrationBuilder.DropTable(
+                name: "Clientes");
         }
     }
 }

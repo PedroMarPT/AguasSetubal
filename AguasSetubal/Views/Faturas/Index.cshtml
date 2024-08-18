@@ -6,12 +6,19 @@
 
 <h1>Faturas</h1>
 
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create Fatura</a>
+</p>
+
 <table class="table">
     <thead>
         <tr>
-            <th>Cliente</th>
-            <th>Data de Emissão</th>
-            <th>Valor Total</th>
+            <th>@Html.DisplayNameFor(model => model.Cliente.Nome)</th>
+            <th>@Html.DisplayNameFor(model => model.DataEmissao)</th>
+            <th>Leitura Anterior</th>
+            <th>Leitura Atual</th>
+            <th>M3Gastos</th>
+            <th>@Html.DisplayNameFor(model => model.Endereco)</th>
             <th></th>
         </tr>
     </thead>
@@ -19,14 +26,28 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.Cliente.Nome</td>
-                <td>@item.DataEmissao.ToString("dd/MM/yyyy")</td>
-                <td>@item.ValorTotal.ToString("C")</td>
+                <td>@Html.DisplayFor(modelItem => item.Cliente.Nome)</td>
+                <td>@Html.DisplayFor(modelItem => item.DataEmissao)</td>
+                <td>@Html.DisplayFor(modelItem => item.LeituraAnterior)</td>
+                <td>@Html.DisplayFor(modelItem => item.LeituraAtual)</td>
+                <td>@Html.DisplayFor(modelItem => item.M3Gastos)</td>
+                <td>@Html.DisplayFor(modelItem => item.Endereco)</td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+
+
+
+
+
+
+
+
 

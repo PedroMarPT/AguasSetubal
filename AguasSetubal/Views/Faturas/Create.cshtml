@@ -4,31 +4,27 @@
     ViewData["Title"] = "Create Fatura";
 }
 
-<h2>Create Fatura</h2>
+<h1>Create Fatura</h1>
 
 <form asp-action="Create">
     <div class="form-group">
         <label asp-for="ClienteId" class="control-label">Cliente</label>
         <select asp-for="ClienteId" class="form-control" asp-items="ViewBag.Clientes"></select>
-        <span asp-validation-for="ClienteId" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="ValorTotal" class="control-label">Valor Total</label>
-        <input asp-for="ValorTotal" class="form-control" />
-        <span asp-validation-for="ValorTotal" class="text-danger"></span>
+        <label asp-for="Endereco" class="control-label">Morada</label>
+        <input asp-for="Endereco" class="form-control" readonly />
     </div>
 
     <div class="form-group">
-        <label asp-for="DataEmissao" class="control-label">Data de Emissão</label>
-        <input asp-for="DataEmissao" class="form-control" type="date" />
-        <span asp-validation-for="DataEmissao" class="text-danger"></span>
+        <label asp-for="LeituraContador.LeituraAnterior" class="control-label">Leitura Anterior</label>
+        <input asp-for="LeituraContador.LeituraAnterior" class="form-control" />
     </div>
 
     <div class="form-group">
-        <label asp-for="Endereco" class="control-label">Endereço</label>
-        <input asp-for="Endereco" class="form-control" />
-        <span asp-validation-for="Endereco" class="text-danger"></span>
+        <label asp-for="LeituraContador.Valor" class="control-label">Leitura Atual</label>
+        <input asp-for="LeituraContador.Valor" class="form-control" />
     </div>
 
     <div class="form-group">
@@ -36,14 +32,7 @@
     </div>
 </form>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
+
 
 

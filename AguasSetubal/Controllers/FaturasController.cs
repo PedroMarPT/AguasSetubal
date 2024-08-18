@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using AguasSetubal.Data;
 using AguasSetubal.Models;
-using Microsoft.AspNetCore.Mvc.Rendering; // Para usar SelectList
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading.Tasks;
+using System;
 
 namespace AguasSetubal.Controllers
 {
@@ -17,60 +19,108 @@ namespace AguasSetubal.Controllers
         }
 
         // GET: Faturas
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var faturas = _context.Faturas.Include(f => f.Cliente).ToList();
-            return View(faturas);
+            var applicationDbContext = _context.Faturas
+                .Include(f => f.Cliente)
+                .Include(f => f.LeituraContador);
+
+            return View(await applicationDbContext.ToListAsync());
         }
 
         // GET: Faturas/Create
         public IActionResult Create()
         {
-            // Carregar a lista de clientes para o dropdown
             ViewBag.Clientes = new SelectList(_context.Clientes, "Id", "Nome");
-            return View();
+            return View(new Fatura
+            {
+                LeituraContador = new LeituraContador()  // Inicializa o objeto para evitar null references
+            });
         }
 
         // POST: Faturas/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Fatura fatura)
+        public async Task<IActionResult> Create([Bind("ClienteId,LeituraContador.LeituraAnterior,LeituraContador.Valor")] Fatura fatura)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Faturas.Add(fatura);
-                    _context.SaveChanges();
+                    // Inicializa LeituraContador caso esteja nulo
+                    if (fatura.LeituraContador == null)
+                    {
+                        fatura.LeituraContador = new LeituraContador();
+                    }
+
+                    // Busca o cliente selecionado
+                    var cliente = await _context.Clientes.FindAsync(fatura.ClienteId);
+                    if (cliente == null)
+                    {
+                        return NotFound("Cliente não encontrado.");
+                    }
+
+                    // Cria uma nova leitura de contador
+                    var leitura = new LeituraContador
+                    {
+                        ClienteId = cliente.Id,
+                        DataLeitura = DateTime.Now,
+                        LeituraAnterior = fatura.LeituraContador.LeituraAnterior,
+                        Valor = fatura.LeituraContador?.Valor ?? 0
+                    };
+
+                    // Calcula o consumo (diferença entre a leitura atual e a leitura anterior)
+                    leitura.Consumo = leitura.Valor - leitura.LeituraAnterior;
+                    leitura.CalcularValorPagar();
+
+                    // Configura a fatura
+                    fatura.DataEmissao = DateTime.Now;
+                    fatura.Endereco = cliente.Morada;
+                    fatura.LeituraContador = leitura;
+
+                    // Calcula o m3Consumo e armazena na fatura
+                    fatura.M3Gastos = leitura.Consumo;
+
+                    // Salva as mudanças no banco de dados
+                    _context.Add(leitura);
+                    _context.Add(fatura);
+                    await _context.SaveChangesAsync();
+
                     return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateException ex)
+                catch (Exception ex)
                 {
-                    // Tratar exceção de atualização do banco de dados
-                    ModelState.AddModelError("", $"Erro ao criar a fatura: {ex.Message}");
+                    // Lida com erros genéricos
+                    ModelState.AddModelError(string.Empty, "Ocorreu um erro ao criar a fatura: " + ex.Message);
                 }
             }
 
-            // Repopular o ViewBag.Clientes em caso de erro
             ViewBag.Clientes = new SelectList(_context.Clientes, "Id", "Nome", fatura.ClienteId);
             return View(fatura);
         }
 
+
+
+
+
         // GET: Faturas/Edit/5
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var fatura = _context.Faturas.Find(id);
+            var fatura = await _context.Faturas
+                .Include(f => f.LeituraContador)
+                .Include(f => f.Cliente)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
             if (fatura == null)
             {
                 return NotFound();
             }
 
-            // Carregar a lista de clientes para o dropdown
             ViewBag.Clientes = new SelectList(_context.Clientes, "Id", "Nome", fatura.ClienteId);
             return View(fatura);
         }
@@ -78,7 +128,7 @@ namespace AguasSetubal.Controllers
         // POST: Faturas/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Fatura fatura)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,ClienteId,LeituraContador.Valor")] Fatura fatura)
         {
             if (id != fatura.Id)
             {
@@ -89,12 +139,42 @@ namespace AguasSetubal.Controllers
             {
                 try
                 {
+                    // Busca o cliente selecionado
+                    var cliente = await _context.Clientes.FindAsync(fatura.ClienteId);
+                    if (cliente == null)
+                    {
+                        return NotFound("Cliente não encontrado.");
+                    }
+
+                    // Busca a leitura do contador relacionada
+                    var leitura = await _context.LeituraContadores
+                        .FirstOrDefaultAsync(l => l.Id == fatura.LeituraContador.Id);
+
+                    if (leitura == null)
+                    {
+                        return NotFound("Leitura de contador não encontrada.");
+                    }
+
+                    // Atualiza os valores da leitura
+                    leitura.Valor = fatura.LeituraContador?.Valor ?? 0;
+                    leitura.Consumo = leitura.Valor - leitura.LeituraAnterior;
+                    leitura.CalcularValorPagar();
+
+                    // Atualiza as leituras do cliente
+                    cliente.LeituraAnteriorContador = cliente.LeituraAtualContador;
+                    cliente.LeituraAtualContador = leitura.Valor;
+
+                    // Atualiza a fatura
+                    fatura.LeituraContador = leitura;
+
+                    // Atualiza as entradas no banco de dados
+                    _context.Update(leitura);
                     _context.Update(fatura);
-                    _context.SaveChanges();
+                    await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_context.Faturas.Any(f => f.Id == fatura.Id))
+                    if (!FaturaExists(fatura.Id))
                     {
                         return NotFound();
                     }
@@ -103,30 +183,31 @@ namespace AguasSetubal.Controllers
                         throw;
                     }
                 }
-                catch (DbUpdateException ex)
+                catch (Exception ex)
                 {
-                    // Tratar exceção de atualização do banco de dados
-                    ModelState.AddModelError("", $"Erro ao atualizar a fatura: {ex.Message}");
+                    // Lida com erros genéricos
+                    ModelState.AddModelError(string.Empty, "Ocorreu um erro ao editar a fatura: " + ex.Message);
                 }
+
                 return RedirectToAction(nameof(Index));
             }
 
-            // Repopular o ViewBag.Clientes em caso de erro
             ViewBag.Clientes = new SelectList(_context.Clientes, "Id", "Nome", fatura.ClienteId);
             return View(fatura);
         }
 
         // GET: Faturas/Details/5
-        public IActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var fatura = _context.Faturas
+            var fatura = await _context.Faturas
                 .Include(f => f.Cliente)
-                .FirstOrDefault(m => m.Id == id);
+                .Include(f => f.LeituraContador)
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (fatura == null)
             {
@@ -137,16 +218,17 @@ namespace AguasSetubal.Controllers
         }
 
         // GET: Faturas/Delete/5
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var fatura = _context.Faturas
+            var fatura = await _context.Faturas
                 .Include(f => f.Cliente)
-                .FirstOrDefault(m => m.Id == id);
+                .Include(f => f.LeituraContador)
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (fatura == null)
             {
@@ -159,30 +241,35 @@ namespace AguasSetubal.Controllers
         // POST: Faturas/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var fatura = _context.Faturas.Find(id);
-
-            if (fatura == null)
-            {
-                return NotFound();
-            }
-
-            try
+            var fatura = await _context.Faturas.FindAsync(id);
+            if (fatura != null)
             {
                 _context.Faturas.Remove(fatura);
-                _context.SaveChanges();
-            }
-            catch (DbUpdateException ex)
-            {
-                // Tratar exceção de atualização do banco de dados
-                ModelState.AddModelError("", $"Erro ao excluir a fatura: {ex.Message}");
-                return View(fatura);
+                await _context.SaveChangesAsync();
             }
 
             return RedirectToAction(nameof(Index));
         }
+
+        private bool FaturaExists(int id)
+        {
+            return _context.Faturas.Any(e => e.Id == id);
+        }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 

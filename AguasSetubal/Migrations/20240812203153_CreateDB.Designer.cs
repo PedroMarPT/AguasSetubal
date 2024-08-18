@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace AguasSetubal.Data.Migrations
+namespace AguasSetubal.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240812074555_AdjustDecimalPrecision")]
-    partial class AdjustDecimalPrecision
+    [Migration("20240812203153_CreateDB")]
+    partial class CreateDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -134,7 +134,7 @@ namespace AguasSetubal.Data.Migrations
 
                     b.HasIndex("ClienteId");
 
-                    b.ToTable("LeituraContador");
+                    b.ToTable("LeituraContadores");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace AguasSetubal.Data.Migrations
+namespace AguasSetubal.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240811163553_AddClienteFields")]
-    partial class AddClienteFields
+    [Migration("20240815105657_updatedatabase")]
+    partial class updatedatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -32,6 +32,9 @@ namespace AguasSetubal.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("Endereco")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("LeituraAtualContador")
                         .HasColumnType("decimal(18,2)");
@@ -81,10 +84,19 @@ namespace AguasSetubal.Data.Migrations
                     b.Property<int>("ClienteId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Data")
+                    b.Property<DateTime>("DataEmissao")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("Valor")
+                    b.Property<string>("Endereco")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("LeituraAnterior")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("LeituraAtual")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ValorTotal")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
@@ -107,14 +119,31 @@ namespace AguasSetubal.Data.Migrations
                     b.Property<DateTime>("DataLeitura")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("DataLeituraAnterior")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("FaturaId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LeituraAnterior")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NumeroContador")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Valor")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("ValorPagar")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ClienteId");
 
-                    b.ToTable("LeiturasContadores");
+                    b.HasIndex("FaturaId");
+
+                    b.ToTable("LeituraContadores");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -320,7 +349,7 @@ namespace AguasSetubal.Data.Migrations
             modelBuilder.Entity("AguasSetubal.Models.Fatura", b =>
                 {
                     b.HasOne("AguasSetubal.Models.Cliente", "Cliente")
-                        .WithMany()
+                        .WithMany("Faturas")
                         .HasForeignKey("ClienteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -331,12 +360,18 @@ namespace AguasSetubal.Data.Migrations
             modelBuilder.Entity("AguasSetubal.Models.LeituraContador", b =>
                 {
                     b.HasOne("AguasSetubal.Models.Cliente", "Cliente")
-                        .WithMany()
+                        .WithMany("Leituras")
                         .HasForeignKey("ClienteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("AguasSetubal.Models.Fatura", "Fatura")
+                        .WithMany()
+                        .HasForeignKey("FaturaId");
+
                     b.Navigation("Cliente");
+
+                    b.Navigation("Fatura");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -388,6 +423,13 @@ namespace AguasSetubal.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("AguasSetubal.Models.Cliente", b =>
+                {
+                    b.Navigation("Faturas");
+
+                    b.Navigation("Leituras");
                 });
 #pragma warning restore 612, 618
         }

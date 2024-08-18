@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace AguasSetubal.Data.Migrations
+namespace AguasSetubal.Migrations
 {
-    public partial class AdjustDecimalPrecision : Migration
+    public partial class faturaUm : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
