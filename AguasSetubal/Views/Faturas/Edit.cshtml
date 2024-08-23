@@ -5,16 +5,24 @@
 <h4>Fatura</h4>
 <hr />
 <div>
-    <form asp-action="Edit">
+    <form asp-action="Edit" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="LeituraContadorId" />
+        <input type="hidden" asp-for="DataEmissao" />
+        <input type="hidden" asp-for="Endereco" />
         <div class="form-group">
             <label asp-for="ClienteId" class="control-label">Cliente</label>
             <select asp-for="ClienteId" class="form-control" asp-items="ViewBag.Clientes"></select>
         </div>
         <div class="form-group">
-            <label asp-for="ValorTotal" class="control-label">Valor</label>
-            <input asp-for="ValorTotal" class="form-control" />
+            <label asp-for="LeituraAnterior" class="control-label">Leitura Anterior</label>
+            <input asp-for="LeituraAnterior" class="form-control" />
         </div>
-        <!-- Outros campos da fatura que você deseja editar -->
+
+        <div class="form-group">
+            <label asp-for="LeituraAtual" class="control-label">Leitura Atual</label>
+            <input asp-for="LeituraAtual" class="form-control" />
+        </div>
         <div class="form-group">
             <input type="submit" value="Save" class="btn btn-primary" />
         </div>

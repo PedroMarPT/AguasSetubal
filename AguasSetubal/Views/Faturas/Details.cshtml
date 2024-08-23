@@ -1,56 +1,104 @@
 ﻿@model AguasSetubal.Models.Fatura
 
-@{
-    ViewData["Title"] = "Detalhes da Fatura";
-}
-
-<h1>Detalhes da Fatura</h1>
-
 <div>
-    <h4>Fatura</h4>
+    <h4>Detalhes da Fatura</h4>
     <hr />
+
     <dl class="row">
+        <!-- Nome do Cliente -->
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Cliente.Nome)
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Cliente.Nome)
         </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.LeituraContador.LeituraAnterior)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.LeituraContador.LeituraAnterior)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.LeituraContador.LeituraAtual)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.LeituraContador.LeituraAtual)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.LeituraContador.Consumo)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.LeituraContador.Consumo)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.DataEmissao)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.DataEmissao)
-        </dd>
+
+        <!-- Endereço do Cliente -->
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Endereco)
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Endereco)
         </dd>
+
+        <!-- Leitura Anterior -->
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.LeituraAnterior)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.LeituraAnterior)
+        </dd>
+
+        <!-- Leitura Atual -->
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.LeituraAtual)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.LeituraAtual)
+        </dd>
+
+        <!-- M3 Gastos -->
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.M3Gastos)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.M3Gastos)
+        </dd>
+
+        <!-- Data de Emissão -->
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DataEmissao)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DataEmissao)
+        </dd>
+
+        <!-- Valor Total a Pagar -->
+        <dt class="col-sm-2">Valor Total a Pagar (€)</dt>
+        <dd class="col-sm-10">
+            @{
+                // Assumindo que M3Gastos é do tipo decimal
+                decimal consumo = Model.M3Gastos;
+                decimal valorTotal = 0.0M;
+                string escalao = "Escalão 1";
+
+                if (consumo <= 5)
+                {
+                    valorTotal = consumo * 0.30M;
+                    escalao = "Escalão 1";
+                }
+                else if (consumo <= 15)
+                {
+                    valorTotal = (5 * 0.30M) + ((consumo - 5) * 0.80M);
+                    escalao = "Escalão 2";
+                }
+                else if (consumo <= 25)
+                {
+                    valorTotal = (5 * 0.30M) + (10 * 0.80M) + ((consumo - 15) * 1.20M);
+                    escalao = "Escalão 3";
+                }
+                else
+                {
+                    valorTotal = (5 * 0.30M) + (10 * 0.80M) + (10 * 1.20M) + ((consumo - 25) * 1.60M);
+                    escalao = "Escalão 4";
+                }
+
+                @valorTotal.ToString("F2")
+            }
+        </dd>
+
+        <!-- Escalão correspondente -->
+        <dt class="col-sm-2">Escalão</dt>
+        <dd class="col-sm-10">
+            @escalao
+        </dd>
     </dl>
+
+    <!-- Link de retorno -->
+    <div>
+        <a href="@Url.Action("Index", "Faturas")" class="btn btn-primary">Voltar para Lista de Faturas</a>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Editar</a> |
-    <a asp-action="Index">Voltar à Lista</a>
-</div>
+
 
 

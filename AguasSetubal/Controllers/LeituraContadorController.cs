@@ -67,7 +67,7 @@ namespace AguasSetubal.Controllers
                 var fatura = new Fatura
                 {
                     ClienteId = leituraContador.ClienteId,
-                   // LeituraContadorId = leituraContador.Id,
+                    LeituraContadorId = leituraContador.Id,
                     DataEmissao = DateTime.Now,
                     ValorTotal = leituraContador.ValorPagar,
                     Endereco = cliente.Morada

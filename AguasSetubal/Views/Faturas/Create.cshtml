@@ -6,31 +6,28 @@
 
 <h1>Create Fatura</h1>
 
-<form asp-action="Create">
+<form asp-action="Create" method="post">
     <div class="form-group">
-        <label asp-for="ClienteId" class="control-label">Cliente</label>
+        <label asp-for="ClienteId" class="control-label"></label>
         <select asp-for="ClienteId" class="form-control" asp-items="ViewBag.Clientes"></select>
     </div>
 
     <div class="form-group">
-        <label asp-for="Endereco" class="control-label">Morada</label>
-        <input asp-for="Endereco" class="form-control" readonly />
+        <label asp-for="LeituraAnterior" class="control-label">Leitura Anterior</label>
+        <input asp-for="LeituraAnterior" class="form-control" />
     </div>
 
     <div class="form-group">
-        <label asp-for="LeituraContador.LeituraAnterior" class="control-label">Leitura Anterior</label>
-        <input asp-for="LeituraContador.LeituraAnterior" class="form-control" />
+        <label asp-for="LeituraAtual" class="control-label">Leitura Atual</label>
+        <input asp-for="LeituraAtual" class="form-control" />
     </div>
 
-    <div class="form-group">
-        <label asp-for="LeituraContador.Valor" class="control-label">Leitura Atual</label>
-        <input asp-for="LeituraContador.Valor" class="form-control" />
-    </div>
-
-    <div class="form-group">
-        <input type="submit" value="Create" class="btn btn-primary" />
-    </div>
+    <button type="submit" class="btn btn-primary">Criar Fatura</button>
 </form>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
 
 
 

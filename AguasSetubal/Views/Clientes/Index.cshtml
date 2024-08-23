@@ -22,7 +22,6 @@
                             <th>@Html.DisplayNameFor(model => model.ContactoTelefonico)</th>
                             <th>@Html.DisplayNameFor(model => model.NumeroContrato)</th>
                             <th>@Html.DisplayNameFor(model => model.NumeroContador)</th>
-                            <th>@Html.DisplayNameFor(model => model.LeituraAtualContador)</th>
                             <th class="text-center">Ações</th>
                         </tr>
                     </thead>
@@ -37,7 +36,6 @@
                                 <td>@Html.DisplayFor(modelItem => item.ContactoTelefonico)</td>
                                 <td>@Html.DisplayFor(modelItem => item.NumeroContrato)</td>
                                 <td>@Html.DisplayFor(modelItem => item.NumeroContador)</td>
-                                <td>@Html.DisplayFor(modelItem => item.LeituraAtualContador)</td>
                                 <td class="text-center">
                                     <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Editar</a>
                                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Detalhes</a>

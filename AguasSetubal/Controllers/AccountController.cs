@@ -14,7 +14,7 @@ namespace YourNamespace.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly AguasSetubal.Services.IEmailSender _emailSender;  // Usando o IEmailSender do seu projeto
+        private readonly AguasSetubal.Services.IEmailSender _emailSender;
 
         public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, AguasSetubal.Services.IEmailSender emailSender)
         {
@@ -113,24 +113,6 @@ namespace YourNamespace.Controllers
 
             return View(model);
         }
-        //public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        var user = await _userManager.FindByEmailAsync(model.Email);
-        //        if (user == null)
-        //        {
-        //            return RedirectToAction("ForgotPasswordConfirmation");
-        //        }
-
-        //        var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-        //        var callbackUrl = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
-        //        // Enviar o email com o link de recuperação
-        //        return RedirectToAction("ForgotPasswordConfirmation");
-        //    }
-
-        //    return View(model);
-        //}
 
         [HttpGet]
         public IActionResult ResetPassword(string code = null)

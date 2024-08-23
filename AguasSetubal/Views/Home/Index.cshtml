@@ -1,4 +1,4 @@
-﻿@{
+﻿@* @{
     ViewData["Title"] = "Home Page";
 }
 
@@ -26,4 +26,72 @@
             </div>
         </div>
     </div>
+</div> *@
+@{
+    ViewData["Title"] = "Página Inicial";
+}
+
+<style>
+    body {
+        background-color: #f0f8ff; /* Cor de fundo suave */
+    }
+
+    .card {
+        height: 100%; /* Garante que os cartões tenham o mesmo tamanho */
+        border-radius: 10px; /* Bordas arredondadas */
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* Espaçamento uniforme */
+    }
+
+    .btn-outline-primary {
+        border-radius: 20px; /* Bordas arredondadas dos botões */
+        transition: background-color 0.3s ease; /* Transição suave */
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #0056b3; /* Cor ao passar o mouse */
+        color: #fff;
+    }
+
+    .card-title i {
+        color: #0056b3;
+        margin-right: 8px;
+    }
+</style>
+
+<div class="text-center mt-4">
+    <h1 class="display-4 text-primary">Bem-vindo ao Sistema de Gestão de Águas De Setúbal</h1>
+    <p class="lead">Escolha uma das opções abaixo para começar a gerir o sistema:</p>
+
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-4 mb-4 d-flex">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-secondary">
+                        <i class="fas fa-file-invoice"></i> <!-- Ícone de Faturas -->
+                        Gerir Faturas
+                    </h5>
+                    <p class="card-text">Aceda ao módulo de faturas para criar, editar ou visualizar faturas.</p>
+                    <a href="/Faturas" class="btn btn-outline-primary btn-block mt-auto">Ir para Faturas</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4 d-flex">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-secondary">
+                        <i class="fas fa-users"></i> <!-- Ícone de Clientes -->
+                        Gerir Clientes
+                    </h5>
+                    <p class="card-text">Aceda ao módulo de clientes para criar, editar ou visualizar informações dos clientes.</p>
+                    <a href="/Clientes" class="btn btn-outline-primary btn-block mt-auto">Ir para Clientes</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+

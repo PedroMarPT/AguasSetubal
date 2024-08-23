@@ -41,47 +41,38 @@ namespace AguasSetubal.Controllers
         // POST: Faturas/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ClienteId,LeituraContador.LeituraAnterior,LeituraContador.Valor")] Fatura fatura)
+        public async Task<IActionResult> Create( Fatura fatura)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // Inicializa LeituraContador caso esteja nulo
-                    if (fatura.LeituraContador == null)
-                    {
-                        fatura.LeituraContador = new LeituraContador();
-                    }
-
-                    // Busca o cliente selecionado
                     var cliente = await _context.Clientes.FindAsync(fatura.ClienteId);
                     if (cliente == null)
                     {
                         return NotFound("Cliente não encontrado.");
                     }
 
+                    var leituraAnterior = fatura.LeituraAnterior;
+                    var leituraAtual = fatura.LeituraAtual;
+
                     // Cria uma nova leitura de contador
                     var leitura = new LeituraContador
                     {
                         ClienteId = cliente.Id,
                         DataLeitura = DateTime.Now,
-                        LeituraAnterior = fatura.LeituraContador.LeituraAnterior,
-                        Valor = fatura.LeituraContador?.Valor ?? 0
+                        LeituraAnterior = leituraAnterior,
+                        Valor = leituraAtual
                     };
 
-                    // Calcula o consumo (diferença entre a leitura atual e a leitura anterior)
-                    leitura.Consumo = leitura.Valor - leitura.LeituraAnterior;
-                    leitura.CalcularValorPagar();
+                    leitura.Consumo = leituraAtual - leituraAnterior;
 
-                    // Configura a fatura
                     fatura.DataEmissao = DateTime.Now;
                     fatura.Endereco = cliente.Morada;
+                    fatura.LeituraAnterior = leituraAnterior;
+                    fatura.LeituraAtual = leituraAtual;
                     fatura.LeituraContador = leitura;
 
-                    // Calcula o m3Consumo e armazena na fatura
-                    fatura.M3Gastos = leitura.Consumo;
-
-                    // Salva as mudanças no banco de dados
                     _context.Add(leitura);
                     _context.Add(fatura);
                     await _context.SaveChangesAsync();
@@ -90,7 +81,6 @@ namespace AguasSetubal.Controllers
                 }
                 catch (Exception ex)
                 {
-                    // Lida com erros genéricos
                     ModelState.AddModelError(string.Empty, "Ocorreu um erro ao criar a fatura: " + ex.Message);
                 }
             }
@@ -98,8 +88,6 @@ namespace AguasSetubal.Controllers
             ViewBag.Clientes = new SelectList(_context.Clientes, "Id", "Nome", fatura.ClienteId);
             return View(fatura);
         }
-
-
 
 
 
@@ -128,7 +116,7 @@ namespace AguasSetubal.Controllers
         // POST: Faturas/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ClienteId,LeituraContador.Valor")] Fatura fatura)
+        public async Task<IActionResult> Edit(int id, Fatura fatura)
         {
             if (id != fatura.Id)
             {
@@ -139,36 +127,13 @@ namespace AguasSetubal.Controllers
             {
                 try
                 {
-                    // Busca o cliente selecionado
                     var cliente = await _context.Clientes.FindAsync(fatura.ClienteId);
                     if (cliente == null)
                     {
                         return NotFound("Cliente não encontrado.");
                     }
+                    fatura.Cliente = cliente;
 
-                    // Busca a leitura do contador relacionada
-                    var leitura = await _context.LeituraContadores
-                        .FirstOrDefaultAsync(l => l.Id == fatura.LeituraContador.Id);
-
-                    if (leitura == null)
-                    {
-                        return NotFound("Leitura de contador não encontrada.");
-                    }
-
-                    // Atualiza os valores da leitura
-                    leitura.Valor = fatura.LeituraContador?.Valor ?? 0;
-                    leitura.Consumo = leitura.Valor - leitura.LeituraAnterior;
-                    leitura.CalcularValorPagar();
-
-                    // Atualiza as leituras do cliente
-                    cliente.LeituraAnteriorContador = cliente.LeituraAtualContador;
-                    cliente.LeituraAtualContador = leitura.Valor;
-
-                    // Atualiza a fatura
-                    fatura.LeituraContador = leitura;
-
-                    // Atualiza as entradas no banco de dados
-                    _context.Update(leitura);
                     _context.Update(fatura);
                     await _context.SaveChangesAsync();
                 }
@@ -185,7 +150,6 @@ namespace AguasSetubal.Controllers
                 }
                 catch (Exception ex)
                 {
-                    // Lida com erros genéricos
                     ModelState.AddModelError(string.Empty, "Ocorreu um erro ao editar a fatura: " + ex.Message);
                 }
 
@@ -259,6 +223,7 @@ namespace AguasSetubal.Controllers
         }
     }
 }
+
 
 
 

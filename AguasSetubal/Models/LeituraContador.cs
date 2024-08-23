@@ -14,14 +14,17 @@ namespace AguasSetubal.Models
         public Cliente Cliente { get; set; }
         public DateTime DataLeituraAnterior { get; set; }
         public decimal ValorPagar { get; set; }
+        public decimal M3Gastos { get; set; } // Consumo calculado (LeituraAtual - LeituraAnterior)
 
         public void CalcularValorPagar()
-        {
-            // Lógica para calcular o valor a pagar com base no consumo
-            ValorPagar = Consumo * 1.5m; // Exemplo: Multiplicando o consumo por 1,5 (valor por m³)
-        }
+            {
+                // Lógica de cálculo do valor a pagar
+            }
 
-        public Fatura Fatura { get; set; }
+            // Propriedade de navegação para Fatura
+            public Fatura Fatura { get; set; }
+        
+
     }
 }
 
