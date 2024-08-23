@@ -1,33 +1,101 @@
 ﻿@model AguasSetubal.Models.Fatura
 
 @{
-    ViewData["Title"] = "Create Fatura";
+    ViewData["Title"] = "Criar Fatura";
 }
 
-<h1>Create Fatura</h1>
+<div class="container mt-5">
+    <h1 class="display-4 text-primary">@ViewData["Title"]</h1>
 
-<form asp-action="Create" method="post">
-    <div class="form-group">
-        <label asp-for="ClienteId" class="control-label"></label>
-        <select asp-for="ClienteId" class="form-control" asp-items="ViewBag.Clientes"></select>
+    <div class="card shadow-lg mt-3">
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <div class="form-group">
+                    <label asp-for="ClienteId" class="control-label">Nome</label>
+                    <select asp-for="ClienteId" class="form-control" asp-items="ViewBag.Clientes"></select>
+                    <span asp-validation-for="ClienteId" class="text-danger"></span>
+                </div>
+
+@*                 <div class="form-group">
+                    <label asp-for="ClienteId" class="control-label">Endereço</label>
+                    <select asp-for="ClienteId" class="form-control" asp-items="ViewBag.Enderecos"></select>
+                    <span asp-validation-for="Endereco" class="text-danger"></span>
+                </div> *@
+
+                <div class="form-group">
+                    <label asp-for="LeituraAnterior" class="control-label">Leitura Anterior</label>
+                    <input asp-for="LeituraAnterior" class="form-control" />
+                    <span asp-validation-for="LeituraAnterior" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="LeituraAtual" class="control-label">Leitura Atual</label>
+                    <input asp-for="LeituraAtual" class="form-control" />
+                    <span asp-validation-for="LeituraAtual" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Criar Fatura</button>
+            </form>
+
+            <div class="mt-3">
+                <a asp-action="Index" class="btn btn-secondary">Voltar à Lista de Faturas</a>
+            </div>
+        </div>
     </div>
-
-    <div class="form-group">
-        <label asp-for="LeituraAnterior" class="control-label">Leitura Anterior</label>
-        <input asp-for="LeituraAnterior" class="form-control" />
-    </div>
-
-    <div class="form-group">
-        <label asp-for="LeituraAtual" class="control-label">Leitura Atual</label>
-        <input asp-for="LeituraAtual" class="form-control" />
-    </div>
-
-    <button type="submit" class="btn btn-primary">Criar Fatura</button>
-</form>
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
+@section Scripts {
+    @{ 
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<style>
+    .container {
+        max-width: 100%;
+        padding: 0 15px;
+    }
+
+    .card {
+        width: 100%;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .display-4 {
+        color: #0056b3;
+    }
+
+    .form-group label {
+        font-weight: bold;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+
+    .text-danger {
+        font-size: 0.9em;
+    }
+</style>
 
 
 

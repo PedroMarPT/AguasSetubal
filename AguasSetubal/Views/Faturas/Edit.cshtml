@@ -1,35 +1,101 @@
 ﻿@model AguasSetubal.Models.Fatura
 
-<h1>Edit Fatura</h1>
+@{
+    ViewData["Title"] = "Editar Fatura";
+}
 
-<h4>Fatura</h4>
-<hr />
-<div>
-    <form asp-action="Edit" enctype="multipart/form-data">
-        <input type="hidden" asp-for="Id" />
-        <input type="hidden" asp-for="LeituraContadorId" />
-        <input type="hidden" asp-for="DataEmissao" />
-        <input type="hidden" asp-for="Endereco" />
-        <div class="form-group">
-            <label asp-for="ClienteId" class="control-label">Cliente</label>
-            <select asp-for="ClienteId" class="form-control" asp-items="ViewBag.Clientes"></select>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="display-4 text-primary">@ViewData["Title"]</h1>
         </div>
-        <div class="form-group">
-            <label asp-for="LeituraAnterior" class="control-label">Leitura Anterior</label>
-            <input asp-for="LeituraAnterior" class="form-control" />
-        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-lg mt-3">
+                <div class="card-body">
+                    <h4>Detalhes da Fatura</h4>
+                    <hr />
+                    <form asp-action="Edit" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="LeituraContadorId" />
+                        <input type="hidden" asp-for="DataEmissao" />
+                        <input type="hidden" asp-for="Endereco" />
 
-        <div class="form-group">
-            <label asp-for="LeituraAtual" class="control-label">Leitura Atual</label>
-            <input asp-for="LeituraAtual" class="form-control" />
+                        <!-- Campo Cliente -->
+                        <div class="form-group">
+                            <label asp-for="ClienteId" class="control-label">Cliente</label>
+                            <select asp-for="ClienteId" class="form-control" asp-items="ViewBag.Clientes" style="line-height: normal;"></select>
+                        </div>
+
+                        <!-- Campo Leitura Anterior -->
+                        <div class="form-group">
+                            <label asp-for="LeituraAnterior" class="control-label">Leitura Anterior</label>
+                            <input asp-for="LeituraAnterior" class="form-control" />
+                        </div>
+
+                        <!-- Campo Leitura Atual -->
+                        <div class="form-group">
+                            <label asp-for="LeituraAtual" class="control-label">Leitura Atual</label>
+                            <input asp-for="LeituraAtual" class="form-control" />
+                        </div>
+
+                        <!-- Botão de Submissão -->
+                        <div class="form-group mt-4">
+                            <input type="submit" value="Guardar" class="btn btn-primary btn-lg" />
+                            <a asp-action="Index" class="btn btn-secondary btn-lg ml-2">Voltar à Lista</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            <input type="submit" value="Save" class="btn btn-primary" />
-        </div>
-    </form>
+    </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+<style>
+    .container {
+        max-width: 100%;
+        padding: 0 15px;
+    }
+
+    .card {
+        width: 100%;
+        border-radius: 10px;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .form-group label {
+        font-weight: bold;
+    }
+
+    .form-control {
+        border-radius: 5px;
+        font-size: 1rem;
+        padding: 10px;
+    }
+
+    select.form-control {
+        line-height: 1.5; /* Ajusta o espaçamento entre linhas do select */
+        padding: 8px; /* Ajusta o padding interno do select */
+    }
+
+    .btn-lg {
+        font-size: 1.125rem;
+        padding: 10px 20px;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+</style>
 

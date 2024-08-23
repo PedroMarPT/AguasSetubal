@@ -1,18 +1,80 @@
-﻿@using Syncfusion.EJ2.Grids
+﻿@* @using Syncfusion.EJ2.Grids
 
 @{
     ViewBag.Title = "Gestão de Clientes";
 }
 
-<div class="container">
-    <h2>Gestão de Clientes</h2>
-    <ejs-grid id="Grid" dataSource="@(ViewBag.Clientes)" allowPaging="true" allowSorting="true">
-        <e-grid-columns>
-            <e-grid-column field="ClienteId" headerText="ID" textAlign="Right" width="120"></e-grid-column>
-            <e-grid-column field="Nome" headerText="Nome" width="150"></e-grid-column>
-            <e-grid-column field="Email" headerText="Email" width="150"></e-grid-column>
-            <e-grid-column field="Telefone" headerText="Telefone" width="150"></e-grid-column>
-        </e-grid-columns>
-    </ejs-grid>
-</div>
+<!-- Estilos customizados para um visual moderno e coerente -->
+<style>
+    .card {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
+    h2 {
+        color: #0056b3; /* Cor do título */
+        font-weight: bold;
+    }
+
+    .e-gridheader, .e-gridfooter {
+        background-color: #f8f9fa; /* Cor de fundo do cabeçalho */
+    }
+
+    .e-headercell {
+        color: #343a40; /* Cor do texto do cabeçalho */
+        font-weight: bold;
+    }
+
+    .e-row:hover {
+        background-color: #e9ecef; /* Cor de fundo ao passar o mouse */
+    }
+
+    .e-grid {
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); /* Sombra da tabela */
+        border-radius: 10px; /* Bordas arredondadas */
+    }
+
+    .e-headertext {
+        font-size: 16px; /* Tamanho do texto do cabeçalho */
+    }
+
+    .e-toolbar-items .e-btn {
+        background-color: #007bff; /* Cor dos botões */
+        color: white;
+        border-radius: 5px; /* Bordas arredondadas dos botões */
+        margin-right: 5px;
+    }
+
+    .e-toolbar-items .e-btn:hover {
+        background-color: #0056b3; /* Cor dos botões ao passar o mouse */
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-lg mt-3">
+                <div class="card-body">
+                    <h2>@ViewBag.Title</h2>
+                    <ejs-grid id="Grid" dataSource="@(ViewBag.Clientes)" allowPaging="true" allowSorting="true" allowFiltering="true" toolbar="new,edit,delete">
+                        <e-grid-columns>
+                            <e-grid-column field="ClienteId" headerText="ID" textAlign="Right" width="120" isPrimaryKey="true"></e-grid-column>
+                            <e-grid-column field="Nome" headerText="Nome" width="150"></e-grid-column>
+                            <e-grid-column field="Email" headerText="Email" width="200"></e-grid-column>
+                            <e-grid-column field="Telefone" headerText="Telefone" width="150"></e-grid-column>
+                            <!-- Coluna de Comandos para botões de ação -->
+                            <e-grid-commandcolumn headerText="Ações" width="150" textAlign="Center">
+                                <e-grid-commandbuttons>
+                                    <e-grid-commandbutton type="Edit" buttonOption="new { content='Editar', cssClass='e-flat' }"></e-grid-commandbutton>
+                                    <e-grid-commandbutton type="Delete" buttonOption="new { content='Eliminar', cssClass='e-flat' }"></e-grid-commandbutton>
+                                </e-grid-commandbuttons>
+                            </e-grid-commandcolumn>
+                        </e-grid-columns>
+                    </ejs-grid>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> *@

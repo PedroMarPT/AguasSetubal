@@ -1,61 +1,49 @@
 ﻿@model AguasSetubal.Models.Cliente
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes do Cliente";
 }
 
-<h1>Details</h1>
+<div class="container-fluid mt-5">
+    <div class="row">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h1 class="display-4 text-primary">@ViewData["Title"]</h1>
+            <a asp-action="Index" class="btn btn-secondary btn-lg">Voltar à Lista</a>
+        </div>
+        <div class="col-lg-8 col-md-10 col-sm-12 mx-auto mt-4">
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <h4 class="card-title text-center">Informações do Cliente</h4>
+                    <hr />
+                    <dl class="row">
+                        <dt class="col-sm-4 font-weight-bold">@Html.DisplayNameFor(model => model.Nome)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.Nome)</dd>
 
-<div>
-    <h4>Cliente</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Nome)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Nome)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Morada)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Morada)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.NumeroCartaoCidadao)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.NumeroCartaoCidadao)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.NIF)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.NIF)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ContactoTelefonico)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ContactoTelefonico)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.NumeroContrato)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.NumeroContrato)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.NumeroContador)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.NumeroContador)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+                        <dt class="col-sm-4 font-weight-bold">@Html.DisplayNameFor(model => model.Morada)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.Morada)</dd>
+
+                        <dt class="col-sm-4 font-weight-bold">@Html.DisplayNameFor(model => model.NumeroCartaoCidadao)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.NumeroCartaoCidadao)</dd>
+
+                        <dt class="col-sm-4 font-weight-bold">@Html.DisplayNameFor(model => model.NIF)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.NIF)</dd>
+
+                        <dt class="col-sm-4 font-weight-bold">@Html.DisplayNameFor(model => model.ContactoTelefonico)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.ContactoTelefonico)</dd>
+
+                        <dt class="col-sm-4 font-weight-bold">@Html.DisplayNameFor(model => model.NumeroContrato)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.NumeroContrato)</dd>
+
+                        <dt class="col-sm-4 font-weight-bold">@Html.DisplayNameFor(model => model.NumeroContador)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.NumeroContador)</dd>
+                    </dl>
+                    <div class="text-center mt-4">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-lg">Editar</a>
+                        <a asp-action="Index" class="btn btn-secondary btn-lg">Voltar à Lista</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 

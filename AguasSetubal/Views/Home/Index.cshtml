@@ -1,33 +1,4 @@
-﻿@* @{
-    ViewData["Title"] = "Home Page";
-}
-
-<div class="text-center">
-    <h1 class="display-4">Bem-vindo ao Sistema de Gestão de Águas</h1>
-    <p>Escolha uma das opções abaixo para começar a gerenciar o sistema:</p>
-
-    <div class="row mt-5">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Gerenciar Faturas</h5>
-                    <p class="card-text">Acesse o módulo de faturas para criar, editar ou visualizar faturas.</p>
-                    <a href="/Faturas" class="btn btn-primary">Ir para Faturas</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Gerenciar Clientes</h5>
-                    <p class="card-text">Acesse o módulo de clientes para criar, editar ou visualizar informações dos clientes.</p>
-                    <a href="/Clientes" class="btn btn-primary">Ir para Clientes</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> *@
-@{
+﻿@{
     ViewData["Title"] = "Página Inicial";
 }
 
@@ -52,10 +23,10 @@
         transition: background-color 0.3s ease; /* Transição suave */
     }
 
-    .btn-outline-primary:hover {
-        background-color: #0056b3; /* Cor ao passar o mouse */
-        color: #fff;
-    }
+        .btn-outline-primary:hover {
+            background-color: #0056b3; /* Cor ao passar o mouse */
+            color: #fff;
+        }
 
     .card-title i {
         color: #0056b3;
@@ -64,10 +35,11 @@
 </style>
 
 <div class="text-center mt-4">
-    <h1 class="display-4 text-primary">Bem-vindo ao Sistema de Gestão de Águas De Setúbal</h1>
+    <h1 class="display-4 text-primary">Bem-vindo ao Sistema de Gestão de Águas de Setúbal</h1>
     <p class="lead">Escolha uma das opções abaixo para começar a gerir o sistema:</p>
 
     <div class="row justify-content-center mt-5">
+        <!-- Card para Gerir Faturas -->
         <div class="col-md-4 mb-4 d-flex">
             <div class="card shadow-sm">
                 <div class="card-body">
@@ -80,6 +52,8 @@
                 </div>
             </div>
         </div>
+
+        <!-- Card para Gerir Clientes -->
         <div class="col-md-4 mb-4 d-flex">
             <div class="card shadow-sm">
                 <div class="card-body">
@@ -94,4 +68,5 @@
         </div>
     </div>
 </div>
+
 
