@@ -110,6 +110,9 @@
 
                     <!-- Link de retorno -->
                     <div class="mt-4">
+                        <a href="@Url.Action("ImprimirFatura", new { id = Model.Id })" class="btn btn-success btn-lg">
+                            Fatura para Pagamento
+                        </a>
                         <a href="@Url.Action("Index", "Faturas")" class="btn btn-primary btn-lg">Voltar para Lista de Faturas</a>
                     </div>
                 </div>

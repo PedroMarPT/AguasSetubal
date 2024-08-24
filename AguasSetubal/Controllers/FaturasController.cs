@@ -217,6 +217,22 @@ namespace AguasSetubal.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> ImprimirFatura(int id)
+        {
+            var fatura = await _context.Faturas
+                .Include(f => f.Cliente)
+                .FirstOrDefaultAsync(f => f.Id == id);
+
+            if (fatura == null)
+            {
+                return NotFound();
+            }
+
+            // Passa a fatura para a view
+            return View(fatura);
+        }
+
+
         private bool FaturaExists(int id)
         {
             return _context.Faturas.Any(e => e.Id == id);

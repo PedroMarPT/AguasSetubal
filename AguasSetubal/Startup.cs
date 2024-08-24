@@ -10,9 +10,8 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.UI.Services;
-
-
-
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace AguasSetubal
 {
@@ -47,6 +46,16 @@ namespace AguasSetubal
             })
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddControllersWithViews(options =>
+            {
+                // Require authenticated users globally
+                var policy = new AuthorizationPolicyBuilder()
+                                 .RequireAuthenticatedUser()
+                                 .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            });
+
 
             // Registrar o EmailSender do seu projeto
             services.AddTransient<AguasSetubal.Services.IEmailSender, AguasSetubal.Services.EmailSender>();
@@ -94,7 +103,7 @@ namespace AguasSetubal
             CreateRoles(serviceProvider).Wait();
         }
 
-        // Método para criar roles e um usuário administrador padrão
+        // Método para criar roles e usuários padrão
         private async Task CreateRoles(IServiceProvider serviceProvider)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -132,9 +141,30 @@ namespace AguasSetubal
                     await userManager.AddToRoleAsync(powerUser, "Admin");
                 }
             }
+
+            // Criação de um utilizador Funcionario por defeito
+            var employeeUser = new IdentityUser
+            {
+                UserName = "funcionario@exemplo.com",
+                Email = "funcionario@exemplo.com",
+            };
+
+            string employeePassword = "Funcionario@123";
+            var employee = await userManager.FindByEmailAsync("funcionario@exemplo.com");
+
+            if (employee == null)
+            {
+                var createEmployeeUser = await userManager.CreateAsync(employeeUser, employeePassword);
+                if (createEmployeeUser.Succeeded)
+                {
+                    // Atribui a role de Funcionario ao utilizador criado
+                    await userManager.AddToRoleAsync(employeeUser, "Funcionario");
+                }
+            }
         }
     }
 }
+
 
 
 
