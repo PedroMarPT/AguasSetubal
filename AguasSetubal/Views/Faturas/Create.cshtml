@@ -15,13 +15,6 @@
                     <select asp-for="ClienteId" class="form-control" asp-items="ViewBag.Clientes"></select>
                     <span asp-validation-for="ClienteId" class="text-danger"></span>
                 </div>
-
-@*                 <div class="form-group">
-                    <label asp-for="ClienteId" class="control-label">Endereço</label>
-                    <select asp-for="ClienteId" class="form-control" asp-items="ViewBag.Enderecos"></select>
-                    <span asp-validation-for="Endereco" class="text-danger"></span>
-                </div> *@
-
                 <div class="form-group">
                     <label asp-for="LeituraAnterior" class="control-label">Leitura Anterior</label>
                     <input asp-for="LeituraAnterior" class="form-control" />
