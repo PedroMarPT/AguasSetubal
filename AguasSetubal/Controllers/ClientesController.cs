@@ -10,28 +10,28 @@ namespace AguasSetubal.Controllers
 {
     public class ClientesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IRepository _repository;
 
-        public ClientesController(ApplicationDbContext context)
+        public ClientesController(IRepository repository)
         {
-            _context = context;
+            this._repository = repository;
         }
 
         // GET: Clientes
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.Clientes.ToListAsync());
+            return View(_repository.GetClients());
         }
 
         // GET: Clientes/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var cliente = await _context.Clientes.FirstOrDefaultAsync(m => m.Id == id);
+            var cliente = _repository.GetClient(id.Value);
             if (cliente == null)
             {
                 return NotFound();
@@ -49,37 +49,37 @@ namespace AguasSetubal.Controllers
         // POST: Clientes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Nome,Morada,NumeroCartaoCidadao,NIF,ContactoTelefonico,NumeroContrato,NumeroContador,LeituraAtualContador")] Cliente cliente)
+        public async Task<IActionResult> Create(Cliente cliente)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(cliente);
-                await _context.SaveChangesAsync();
+                _repository.AddClient(cliente);
+                await _repository.SaveAllAsync();
+
                 return RedirectToAction(nameof(Index));
             }
             return View(cliente);
         }
 
         // GET: Clientes/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var cliente = await _context.Clientes.FindAsync(id);
+            var cliente = _repository.GetClient(id.Value);
             if (cliente == null)
             {
                 return NotFound();
             }
             return View(cliente);
         }
-
         // POST: Clientes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Morada,NumeroCartaoCidadao,NIF,ContactoTelefonico,NumeroContrato,NumeroContador,LeituraAtualContador")] Cliente cliente)
+        public async Task<IActionResult> Edit(int id, Cliente cliente)
         {
             if (id != cliente.Id)
             {
@@ -90,12 +90,12 @@ namespace AguasSetubal.Controllers
             {
                 try
                 {
-                    _context.Update(cliente);
-                    await _context.SaveChangesAsync();
+                    _repository.UpdateClient(cliente);
+                    await _repository.SaveAllAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClienteExists(cliente.Id))
+                    if (!_repository.ClientExists(cliente.Id))
                     {
                         return NotFound();
                     }
@@ -110,14 +110,14 @@ namespace AguasSetubal.Controllers
         }
 
         // GET: Clientes/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public IActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var cliente = await _context.Clientes.FirstOrDefaultAsync(m => m.Id == id);
+            var cliente = _repository.GetClient(id.Value);
             if (cliente == null)
             {
                 return NotFound();
@@ -131,16 +131,15 @@ namespace AguasSetubal.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var cliente = await _context.Clientes.FindAsync(id);
-            _context.Clientes.Remove(cliente);
-            await _context.SaveChangesAsync();
+            var cliente = _repository.GetClient(id);
+            _repository.RemoveClient(cliente);
+            await _repository.SaveAllAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ClienteExists(int id)
-        {
-            return _context.Clientes.Any(e => e.Id == id);
-        }
     }
 }
+
+
 
