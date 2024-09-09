@@ -8,11 +8,11 @@ using AguasSetubal.Models;
 
 namespace AguasSetubal.Controllers
 {
-    public class ClientesController : Controller
+    public class ClientController : Controller
     {
         private readonly IRepository _repository;
 
-        public ClientesController(IRepository repository)
+        public ClientController(IRepository repository)
         {
             this._repository = repository;
         }
@@ -119,6 +119,7 @@ namespace AguasSetubal.Controllers
 
             var cliente = _repository.GetClient(id.Value);
             if (cliente == null)
+
             {
                 return NotFound();
             }

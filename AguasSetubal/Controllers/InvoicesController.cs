@@ -9,11 +9,11 @@ using System;
 
 namespace AguasSetubal.Controllers
 {
-    public class FaturasController : Controller
+    public class InvoicesController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public FaturasController(ApplicationDbContext context)
+        public InvoicesController(ApplicationDbContext context)
         {
             _context = context;
         }
