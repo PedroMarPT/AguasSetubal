@@ -8,30 +8,30 @@ using AguasSetubal.Models;
 
 namespace AguasSetubal.Controllers
 {
-    public class ClientController : Controller
+    public class ClientsController : Controller
     {
-        private readonly IRepository _repository;
+        private readonly IClientsRepository _clientsRepository;
 
-        public ClientController(IRepository repository)
+        public ClientsController(IClientsRepository clientsRepository)
         {
-            this._repository = repository;
+            this._clientsRepository = clientsRepository;
         }
 
         // GET: Clientes
         public IActionResult Index()
         {
-            return View(_repository.GetClients());
+            return View(_clientsRepository.GetAll());
         }
 
         // GET: Clientes/Details/5
-        public IActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var cliente = _repository.GetClient(id.Value);
+            var cliente = await _clientsRepository.GetByIdAsync(id.Value);
             if (cliente == null)
             {
                 return NotFound();
@@ -53,8 +53,7 @@ namespace AguasSetubal.Controllers
         {
             if (ModelState.IsValid)
             {
-                _repository.AddClient(cliente);
-                await _repository.SaveAllAsync();
+                await _clientsRepository.CreateAsync(cliente);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -62,20 +61,21 @@ namespace AguasSetubal.Controllers
         }
 
         // GET: Clientes/Edit/5
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var cliente = _repository.GetClient(id.Value);
+            var cliente = await _clientsRepository.GetByIdAsync(id.Value);
             if (cliente == null)
             {
                 return NotFound();
             }
             return View(cliente);
         }
+
         // POST: Clientes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -90,12 +90,11 @@ namespace AguasSetubal.Controllers
             {
                 try
                 {
-                    _repository.UpdateClient(cliente);
-                    await _repository.SaveAllAsync();
+                    await _clientsRepository.UpdateAsync(cliente);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_repository.ClientExists(cliente.Id))
+                    if (!await _clientsRepository.ExistsAsync(cliente.Id))
                     {
                         return NotFound();
                     }
@@ -110,16 +109,15 @@ namespace AguasSetubal.Controllers
         }
 
         // GET: Clientes/Delete/5
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var cliente = _repository.GetClient(id.Value);
+            var cliente = await _clientsRepository.GetByIdAsync(id.Value);
             if (cliente == null)
-
             {
                 return NotFound();
             }
@@ -132,15 +130,15 @@ namespace AguasSetubal.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var cliente = _repository.GetClient(id);
-            _repository.RemoveClient(cliente);
-            await _repository.SaveAllAsync();
+            var cliente = await _clientsRepository.GetByIdAsync(id);
+            await _clientsRepository.DeleteAsync(cliente);
 
             return RedirectToAction(nameof(Index));
         }
 
     }
 }
+
 
 
 

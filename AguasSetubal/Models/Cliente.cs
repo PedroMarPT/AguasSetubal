@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using AguasSetubal.Data;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace AguasSetubal.Models
 {
-    public class Cliente
+    public class Cliente : IEntity 
     {
         public int Id { get; set; }
         public string Nome { get; set; }

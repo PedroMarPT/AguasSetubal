@@ -34,7 +34,8 @@ namespace AguasSetubal
 
             // Filtro de exceções para a página de desenvolvedor de banco de dados
             services.AddDatabaseDeveloperPageExceptionFilter();
-            services.AddScoped<IRepository, Repository>();
+            services.AddScoped<IClientsRepository, ClientsRepository>();
+            services.AddScoped<IInvoicesRepository, InvoicesRepository>();
 
             // Configuração do Identity para autenticação e autorização
             services.AddDefaultIdentity<IdentityUser>(options =>

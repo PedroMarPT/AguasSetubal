@@ -11,11 +11,13 @@ namespace AguasSetubal.Controllers
 {
     public class InvoicesController : Controller
     {
+        private readonly IInvoicesRepository _invoicesRepository;
         private readonly ApplicationDbContext _context;
 
-        public InvoicesController(ApplicationDbContext context)
+        public InvoicesController(ApplicationDbContext context, IInvoicesRepository invoicesRepository)
         {
             _context = context;
+            _invoicesRepository = invoicesRepository;
         }
 
         // GET: Faturas
@@ -41,7 +43,7 @@ namespace AguasSetubal.Controllers
         // POST: Faturas/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create( Fatura fatura)
+        public async Task<IActionResult> Create(Fatura fatura)
         {
             if (ModelState.IsValid)
             {
@@ -134,12 +136,11 @@ namespace AguasSetubal.Controllers
                     }
                     fatura.Cliente = cliente;
 
-                    _context.Update(fatura);
-                    await _context.SaveChangesAsync();
+                    await _invoicesRepository.UpdateAsync(fatura);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!FaturaExists(fatura.Id))
+                    if (!await _invoicesRepository.ExistsAsync(fatura.Id))
                     {
                         return NotFound();
                     }
@@ -207,15 +208,15 @@ namespace AguasSetubal.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var fatura = await _context.Faturas.FindAsync(id);
+            var fatura = await _invoicesRepository.GetByIdAsync(id);
             if (fatura != null)
             {
-                _context.Faturas.Remove(fatura);
-                await _context.SaveChangesAsync();
+                await _invoicesRepository.DeleteAsync(fatura);
             }
 
             return RedirectToAction(nameof(Index));
         }
+
 
         public async Task<IActionResult> ImprimirFatura(int id)
         {
@@ -231,14 +232,10 @@ namespace AguasSetubal.Controllers
             // Passa a fatura para a view
             return View(fatura);
         }
-
-
-        private bool FaturaExists(int id)
-        {
-            return _context.Faturas.Any(e => e.Id == id);
-        }
     }
 }
+
+
 
 
 

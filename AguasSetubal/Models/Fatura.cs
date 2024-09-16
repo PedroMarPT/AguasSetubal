@@ -1,8 +1,9 @@
-﻿using System;
+﻿using AguasSetubal.Data;
+using System;
 
 namespace AguasSetubal.Models
 {
-    public class Fatura
+    public class Fatura : IEntity
     {
         public int Id { get; set; }
 
