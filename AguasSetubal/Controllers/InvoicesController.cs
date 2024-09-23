@@ -232,6 +232,19 @@ namespace AguasSetubal.Controllers
             // Passa a fatura para a view
             return View(fatura);
         }
+
+
+        [HttpGet]
+        public JsonResult GetLastReadingByClientId(int? id)
+        {
+            var fatura = _context.Faturas
+                .OrderBy(i => i.Id)
+                .LastOrDefault(m => m.ClienteId == id);
+
+            var lastReading = fatura != null ? fatura.LeituraAtual : 0;
+
+            return Json(new { lastReading = lastReading });
+        }
     }
 }
 

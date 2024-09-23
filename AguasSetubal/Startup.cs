@@ -12,6 +12,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Syncfusion.XlsIO.Parser.Biff_Records;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using AguasSetubal.Helpers;
 
 namespace AguasSetubal
 {
@@ -34,20 +39,39 @@ namespace AguasSetubal
 
             // Filtro de exceções para a página de desenvolvedor de banco de dados
             services.AddDatabaseDeveloperPageExceptionFilter();
+
             services.AddScoped<IClientsRepository, ClientsRepository>();
             services.AddScoped<IInvoicesRepository, InvoicesRepository>();
+            services.AddScoped<IMailHelper, MailHelper>();
 
             // Configuração do Identity para autenticação e autorização
             services.AddDefaultIdentity<IdentityUser>(options =>
             {
+                //options.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
+                //options.SignIn.RequireConfirmedEmail = true;
+                //options.User.RequireUniqueEmail = true;
                 options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = true;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = true;
                 options.Password.RequiredLength = 6;
             })
+            .AddDefaultTokenProviders()
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
+
+
+            services.AddAuthentication()
+                .AddCookie()
+                .AddJwtBearer(c =>
+                {
+                    c.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidIssuer = this.Configuration["Tokens: Issuer"],
+                        ValidAudience = this.Configuration["Tokens: Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.Configuration["Tokens:Key"]))
+                    };
+                });
 
             services.AddControllersWithViews(options =>
             {
