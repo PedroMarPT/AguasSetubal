@@ -7,7 +7,7 @@
 <div class="container-fluid mt-5">
     <div class="row">
         <div class="col-12 d-flex justify-content-between align-items-center">
-            <h1 class="display-4 text-primary">@ViewData["Title"]</h1>
+            <h4 class="display-4 text-primary">@ViewData["Title"]</h4>
             <a asp-action="Create" class="btn btn-primary btn-lg">Criar nova Fatura</a>
         </div>
         <div class="col-12">
@@ -19,10 +19,8 @@
                                 <tr>
                                     <th>@Html.DisplayNameFor(model => model.First().Cliente.Nome)</th>
                                     <th>@Html.DisplayNameFor(model => model.First().DataEmissao)</th>
-                                    <th>Leitura Anterior</th>
-                                    <th>Leitura Atual</th>
-                                    <th>M3 Gastos</th>
-                                    <th>@Html.DisplayNameFor(model => model.First().Endereco)</th>
+                                    <th>Consumo</th>
+                                    <th>Valor</th>
                                     <th class="text-center">Ações</th>
                                 </tr>
                             </thead>
@@ -32,10 +30,8 @@
                                     <tr>
                                         <td>@Html.DisplayFor(modelItem => item.Cliente.Nome)</td>
                                         <td>@Html.DisplayFor(modelItem => item.DataEmissao)</td>
-                                        <td>@Html.DisplayFor(modelItem => item.LeituraAnterior)</td>
-                                        <td>@Html.DisplayFor(modelItem => item.LeituraAtual)</td>
-                                        <td>@Html.DisplayFor(modelItem => item.M3Gastos)</td>
-                                        <td>@Html.DisplayFor(modelItem => item.Endereco)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.ConsumoTotal)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.ValorTotal)</td>
                                         <td class="text-center">
                                             <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm mx-1">Editar</a>
                                             <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm mx-1">Detalhes</a>
@@ -107,16 +103,3 @@
         min-width: 100px;
     }
 </style>
-
-
-
-
-
-
-
-
-
-
-
-
-

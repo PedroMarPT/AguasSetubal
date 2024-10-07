@@ -2,70 +2,201 @@
 for details on configuring this project to bundle and minify static web assets. */
 
 a.navbar-brand {
-  white-space: normal;
-  text-align: center;
-  word-break: break-all;
+    white-space: normal;
+    text-align: center;
+    word-break: break-all;
 }
 
 /* Provide sufficient contrast against white background */
 a {
-  color: #0366d6;
+    color: #0366d6;
 }
 
 .btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
 }
 
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
 }
 
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
+
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .border-top {
-  border-top: 1px solid #e5e5e5;
+    border-top: 1px solid #e5e5e5;
 }
+
 .border-bottom {
-  border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
 }
 
 .box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
 }
 
 button.accept-policy {
-  font-size: 1rem;
-  line-height: inherit;
+    font-size: 1rem;
+    line-height: inherit;
 }
 
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  /* Margin bottom by footer height */
-  margin-bottom: 60px;
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
 }
+
 .footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px; /* Vertically center the text there */
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px; /* Vertically center the text there */
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+.container-fluid {
+    max-width: 100%;
+    padding: 0 15px;
+}
+
+.card {
+    width: 100%;
+}
+
+.table-responsive {
+    max-height: 80vh;
+}
+
+.table thead th {
+    text-align: left;
+    padding: 12px;
+}
+
+.table tbody td {
+    padding: 12px;
+    text-align: left;
+    color: #333;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #cceeff;
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+    background-color: #e9f7fe;
+}
+
+.table tbody tr:hover {
+    background-color: #b3e0ff;
+}
+
+.table tbody td {
+    border-top: 1px solid #ddd;
+}
+
+.table td, .table th {
+    white-space: nowrap;
+}
+
+.btn {
+    min-width: 50px;
+}
+
+.column-with-min-250 {
+    min-width: 250px !important;
+}
+
+.bell-notification {
+    font-size: 20px !important;
+    margin-top: 10px !important;
+    margin-left: 8px !important;
+}
+
+/*nothing to do with this*/
+.scroll {
+    height: 500px;
+    overflow: auto;
+}
+
+    .scroll::-webkit-scrollbar {
+        width: 16px;
+    }
+
+    .scroll::-webkit-scrollbar-track {
+        -webkit-border-radius: 10px;
+        border-radius: 10px;
+        background: white;
+    }
+
+    .scroll::-webkit-scrollbar-thumb {
+        -webkit-border-radius: 10px;
+        border-radius: 10px;
+        background: #ADADAD;
+    }
+
+        .scroll::-webkit-scrollbar-thumb:window-inactive {
+            background: #ADADAD;
+        }
+
+.card {
+    background-color: #f8f9fa;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1, h4 {
+    color: #0056b3;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    transition: background-color 0.3s ease;
+}
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+
+.form-control {
+    border-radius: 5px;
+}
+
+.text-danger {
+    font-size: 0.9em;
+}
+
+.back-to-list {
+    margin-top: 20px;
+}
+
+.form-group label {
+    font-weight: bold;
 }

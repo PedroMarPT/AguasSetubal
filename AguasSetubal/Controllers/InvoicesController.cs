@@ -6,6 +6,12 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
+using Microsoft.AspNetCore.Authorization;
+using AguasSetubal.Helpers;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc;
+using Microsoft.CodeAnalysis.CSharp;
+using static Fable.Core.JS;
+using System.Runtime.Serialization;
 
 namespace AguasSetubal.Controllers
 {
@@ -13,31 +19,50 @@ namespace AguasSetubal.Controllers
     {
         private readonly IInvoicesRepository _invoicesRepository;
         private readonly ApplicationDbContext _context;
+        private readonly IUserHelper _userHelper;
 
-        public InvoicesController(ApplicationDbContext context, IInvoicesRepository invoicesRepository)
+        public InvoicesController(ApplicationDbContext context, IInvoicesRepository invoicesRepository, IUserHelper userHelper)
         {
             _context = context;
             _invoicesRepository = invoicesRepository;
+            _userHelper = userHelper;
         }
 
-        // GET: Faturas
-        public async Task<IActionResult> Index()
-        {
-            var applicationDbContext = _context.Faturas
-                .Include(f => f.Cliente)
-                .Include(f => f.LeituraContador);
 
-            return View(await applicationDbContext.ToListAsync());
+        // GET: Faturas
+        public async Task<IActionResult> Index(string id)
+        {
+            var listaFaturas = _context.Faturas
+                .Include(f => f.Cliente)
+                .Include(f => f.LeiturasContador);
+
+            if (id != null && listaFaturas.Any())
+            {
+                var userId = await _userHelper.GetUserByNameAsync(id);
+
+                var clientId = _context.Clientes.FirstOrDefault(c => c.UserId == userId.Id).Id;
+
+                var listaFaturasPorCliente = _context.Faturas
+                .Include(f => f.Cliente)
+                .Include(f => f.LeiturasContador)
+                .Where(c => c.ClienteId == clientId);
+
+                return View(await listaFaturasPorCliente.ToListAsync());
+            }
+
+            return View(await listaFaturas.ToListAsync());
         }
 
         // GET: Faturas/Create
         public IActionResult Create()
         {
+            Fatura novaFatura = new Fatura();
+            novaFatura.DataInicio = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            novaFatura.DataFim = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
+
             ViewBag.Clientes = new SelectList(_context.Clientes, "Id", "Nome");
-            return View(new Fatura
-            {
-                LeituraContador = new LeituraContador()  // Inicializa o objeto para evitar null references
-            });
+
+            return View(novaFatura);
         }
 
         // POST: Faturas/Create
@@ -55,28 +80,58 @@ namespace AguasSetubal.Controllers
                         return NotFound("Cliente não encontrado.");
                     }
 
-                    var leituraAnterior = fatura.LeituraAnterior;
-                    var leituraAtual = fatura.LeituraAtual;
+                    fatura.Cliente = cliente;
 
-                    // Cria uma nova leitura de contador
-                    var leitura = new LeituraContador
+                    var contador = await _context.Contador.FindAsync(fatura.ContadorId);
+                    if (contador == null)
                     {
-                        ClienteId = cliente.Id,
-                        DataLeitura = DateTime.Now,
-                        LeituraAnterior = leituraAnterior,
-                        Valor = leituraAtual
-                    };
+                        return NotFound("Contador não encontrado.");
+                    }
 
-                    leitura.Consumo = leituraAtual - leituraAnterior;
+                    var tabelaPrecos = _context.TabelaPrecos.ToList();
+                    if (!tabelaPrecos.Any())
+                    {
+                        return NotFound("Tabela preços vazia.");
+                    }
+
+                    fatura.Contador = contador;
+
+                    var listaLeituras = _context.LeituraContadores
+                        .Where(c => c.ContadorId == fatura.ContadorId
+                        && c.IsInvoiced == false
+                        && c.DataLeitura.Year >= fatura.DataInicio.Year
+                        && c.DataLeitura.Month >= fatura.DataInicio.Month
+                        && c.DataLeitura.Day >= fatura.DataInicio.Day
+                        && c.DataLeitura.Year <= fatura.DataFim.Year
+                        && c.DataLeitura.Month <= fatura.DataFim.Month
+                        && c.DataLeitura.Day <= fatura.DataFim.Day).ToList();
+
+                    foreach (var leitura in listaLeituras)
+                    {
+                        fatura.ConsumoTotal += (leitura.LeituraAtual - leitura.LeituraAnterior);
+                        fatura.LeiturasContador.Add(leitura);
+                    }
+
+                    foreach (var item in tabelaPrecos)
+                    {
+                        if (fatura.ConsumoTotal > item.LimiteInferior
+                            && (fatura.ConsumoTotal <= item.LimiteSuperior || item.LimiteSuperior == 0))
+                        {
+                            fatura.Descritivo = item.NomeEscalao;
+                            fatura.ValorTotal = item.ValorUnitario * fatura.ConsumoTotal;
+                            fatura.ValorUnitario = item.ValorUnitario;
+                        }
+                    }
 
                     fatura.DataEmissao = DateTime.Now;
-                    fatura.Endereco = cliente.Morada;
-                    fatura.LeituraAnterior = leituraAnterior;
-                    fatura.LeituraAtual = leituraAtual;
-                    fatura.LeituraContador = leitura;
 
-                    _context.Add(leitura);
-                    _context.Add(fatura);
+                    await _invoicesRepository.CreateAsync(fatura);
+
+                    foreach (var leitura in listaLeituras)
+                    {
+                        leitura.IsInvoiced = true;
+                        _context.Update(leitura);
+                    }
                     await _context.SaveChangesAsync();
 
                     return RedirectToAction(nameof(Index));
@@ -87,7 +142,7 @@ namespace AguasSetubal.Controllers
                 }
             }
 
-            ViewBag.Clientes = new SelectList(_context.Clientes, "Id", "Nome", fatura.ClienteId);
+            ViewBag.Clientes = new SelectList(_context.Clientes.Distinct(), "Id", "Nome", fatura.ClienteId);
             return View(fatura);
         }
 
@@ -102,7 +157,6 @@ namespace AguasSetubal.Controllers
             }
 
             var fatura = await _context.Faturas
-                .Include(f => f.LeituraContador)
                 .Include(f => f.Cliente)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
@@ -114,6 +168,7 @@ namespace AguasSetubal.Controllers
             ViewBag.Clientes = new SelectList(_context.Clientes, "Id", "Nome", fatura.ClienteId);
             return View(fatura);
         }
+
 
         // POST: Faturas/Edit/5
         [HttpPost]
@@ -171,7 +226,7 @@ namespace AguasSetubal.Controllers
 
             var fatura = await _context.Faturas
                 .Include(f => f.Cliente)
-                .Include(f => f.LeituraContador)
+                .Include(f => f.Contador)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (fatura == null)
@@ -192,7 +247,6 @@ namespace AguasSetubal.Controllers
 
             var fatura = await _context.Faturas
                 .Include(f => f.Cliente)
-                .Include(f => f.LeituraContador)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (fatura == null)
@@ -222,6 +276,7 @@ namespace AguasSetubal.Controllers
         {
             var fatura = await _context.Faturas
                 .Include(f => f.Cliente)
+                .Include(f => f.Contador)
                 .FirstOrDefaultAsync(f => f.Id == id);
 
             if (fatura == null)
@@ -237,30 +292,13 @@ namespace AguasSetubal.Controllers
         [HttpGet]
         public JsonResult GetLastReadingByClientId(int? id)
         {
-            var fatura = _context.Faturas
+            var ultimaleitura = _context.LeituraContadores
                 .OrderBy(i => i.Id)
-                .LastOrDefault(m => m.ClienteId == id);
+                .LastOrDefault(m => m.ContadorId == id);
 
-            var lastReading = fatura != null ? fatura.LeituraAtual : 0;
+            var lastReading = ultimaleitura != null ? ultimaleitura.LeituraAtual : 0;
 
             return Json(new { lastReading = lastReading });
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

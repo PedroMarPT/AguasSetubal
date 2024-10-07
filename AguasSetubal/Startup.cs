@@ -1,4 +1,4 @@
-using AguasSetubal.Data;
+Ôªøusing AguasSetubal.Data;
 using AguasSetubal.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -17,6 +17,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using AguasSetubal.Helpers;
+using AguasSetubal.Models;
+using Microsoft.IdentityModel.Logging;
+using System.Linq;
 
 namespace AguasSetubal
 {
@@ -29,168 +32,287 @@ namespace AguasSetubal
 
         public IConfiguration Configuration { get; }
 
-        // MÈtodo para adicionar serviÁos ao contÍiner
+        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Registro do DbContext com a string de conex„o
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-
-            // Filtro de exceÁıes para a p·gina de desenvolvedor de banco de dados
-            services.AddDatabaseDeveloperPageExceptionFilter();
-
-            services.AddScoped<IClientsRepository, ClientsRepository>();
-            services.AddScoped<IInvoicesRepository, InvoicesRepository>();
-            services.AddScoped<IMailHelper, MailHelper>();
-
-            // ConfiguraÁ„o do Identity para autenticaÁ„o e autorizaÁ„o
-            services.AddDefaultIdentity<IdentityUser>(options =>
+            services.AddIdentity<User, IdentityRole>(cfg =>
             {
-                //options.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
-                //options.SignIn.RequireConfirmedEmail = true;
-                //options.User.RequireUniqueEmail = true;
-                options.Password.RequireDigit = true;
-                options.Password.RequireLowercase = true;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = true;
-                options.Password.RequiredLength = 6;
+                cfg.User.RequireUniqueEmail = true;
+                cfg.Password.RequireDigit = false;
+                cfg.Password.RequiredUniqueChars = 0;
+                cfg.Password.RequireLowercase = false;
+                cfg.Password.RequireUppercase = false;
+                cfg.Password.RequireNonAlphanumeric = false;
+                cfg.Password.RequiredLength = 6;
+                cfg.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
+                cfg.SignIn.RequireConfirmedEmail = true;
             })
-            .AddDefaultTokenProviders()
-            .AddRoles<IdentityRole>()
-            .AddEntityFrameworkStores<ApplicationDbContext>();
-
+                .AddDefaultTokenProviders()
+                .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddAuthentication()
                 .AddCookie()
-                .AddJwtBearer(c =>
+                .AddJwtBearer(cfg =>
                 {
-                    c.TokenValidationParameters = new TokenValidationParameters
+                    cfg.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidIssuer = this.Configuration["Tokens: Issuer"],
-                        ValidAudience = this.Configuration["Tokens: Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.Configuration["Tokens:Key"]))
+                        ValidIssuer = this.Configuration["Tokens:Issuer"],
+                        ValidAudience = this.Configuration["Tokens:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(this.Configuration["Tokens:Key"])),
                     };
                 });
 
-            services.AddControllersWithViews(options =>
+            services.AddDbContext<ApplicationDbContext>(cfg =>
             {
-                // Require authenticated users globally
-                var policy = new AuthorizationPolicyBuilder()
-                                 .RequireAuthenticatedUser()
-                                 .Build();
-                options.Filters.Add(new AuthorizeFilter(policy));
+                cfg.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            //services.AddFlashMessage();
 
-            // Registrar o EmailSender do seu projeto
-            services.AddTransient<AguasSetubal.Services.IEmailSender, AguasSetubal.Services.EmailSender>();
+            services.AddTransient<SeedDb>();                                             // Creates an object, and when it's deleted, it can't be created again
+            //services.AddScoped<IBlobHelper, BlobHelper>();
+            //services.AddScoped<IConverterHelper, ConverterHelper>();
 
-            // Adiciona suporte para controllers e views
+            services.AddScoped<IUserHelper, UserHelper>();
+            services.AddScoped<IClientsRepository, ClientsRepository>();
+            services.AddScoped<IInvoicesRepository, InvoicesRepository>();
+            services.AddScoped<IPricesRepository, PricesRepository>();
+            services.AddScoped<IMailHelper, MailHelper>();
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Account/NotAuthorized";
+                options.AccessDeniedPath = "/Account/NotAuthorized";
+            });
+
             services.AddControllersWithViews();
-
-            // Adiciona suporte para Razor Pages
-            services.AddRazorPages();
         }
 
-        // MÈtodo para configurar o pipeline de requisiÁıes HTTP
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IUserHelper userHelper,
+            IClientsRepository clientsRepository, IPricesRepository pricesRepository)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseMigrationsEndPoint();
+
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error"); // Redireciona para a p·gina de erro em produÁ„o
-                app.UseStatusCodePagesWithReExecute("/Home/NotFound");
-                app.UseHsts(); // ForÁa o uso de HTTPS em produÁ„o
+                app.UseExceptionHandler("/Errors/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
             }
 
-            app.UseHttpsRedirection(); // Redireciona HTTP para HTTPS
-            app.UseStaticFiles(); // Habilita o uso de arquivos est·ticos como CSS e JS
+            app.UseStatusCodePagesWithReExecute("/error/{0}");
 
-            app.UseRouting(); // Configura o roteamento
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
 
-            app.UseAuthentication(); // Habilita a autenticaÁ„o
-            app.UseAuthorization(); // Habilita a autorizaÁ„o
+            app.UseRouting();
 
-            // Configura as rotas dos endpoints
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-                endpoints.MapRazorPages(); // Mapeia as Razor Pages
             });
 
-            // Chama o mÈtodo para criar as roles e um utilizador admin por defeito
-            CreateRoles(serviceProvider).Wait();
+            // Chama o m√©todo para criar as roles e um utilizador admin por defeito
+            CreateUsersAndRoles(userHelper).Wait();
+
+            // Chama o m√©todo para criar clientes
+            CreateClients(clientsRepository).Wait();
+
+            // Chama o m√©todo para criar tabela pre√ßos inicial
+            CreatePrices(pricesRepository).Wait();
         }
 
-        // MÈtodo para criar roles e usu·rios padr„o
-        private async Task CreateRoles(IServiceProvider serviceProvider)
+
+        // M√©todo para criar clientes tabela pre√ßos inicial
+        private async Task CreatePrices(IPricesRepository pricesRepository)
         {
-            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
-
-            // Definindo os nomes das roles
-            string[] roleNames = { "Admin", "Funcionario", "Cliente", "Anonimo" };
-            IdentityResult roleResult;
-
-            foreach (var roleName in roleNames)
+            var _pricesRepository = pricesRepository;
+            var allPrices = _pricesRepository.GetAll();
+            if (!allPrices.Any())
             {
-                var roleExist = await roleManager.RoleExistsAsync(roleName);
-                if (!roleExist)
+                var priceLine = new TabelaPrecos
                 {
-                    roleResult = await roleManager.CreateAsync(new IdentityRole(roleName));
-                }
+                    NomeEscalao = "1¬∫ escal√£o at√© 5 m3",
+                    LimiteInferior = 0,
+                    LimiteSuperior = 5,
+                    ValorUnitario = 0.30M
+                };
+                await _pricesRepository.CreateAsync(priceLine);
+
+                priceLine = new TabelaPrecos
+                {
+                    NomeEscalao = "2¬∫ escal√£o superior a 5 m3 e at√© 15 m3",
+                    LimiteInferior = 5,
+                    LimiteSuperior = 15,
+                    ValorUnitario = 0.80M
+                };
+                await _pricesRepository.CreateAsync(priceLine);
+
+                priceLine = new TabelaPrecos
+                {
+                    NomeEscalao = "3¬∫ escal√£o superior a 15 cm3 e at√© 25 m3",
+                    LimiteInferior = 15,
+                    LimiteSuperior = 25,
+                    ValorUnitario = 1.20M
+                };
+                await _pricesRepository.CreateAsync(priceLine);
+
+                priceLine = new TabelaPrecos
+                {
+                    NomeEscalao = "4¬∫ escal√£o superior a 25 m3",
+                    LimiteInferior = 25,
+                    LimiteSuperior = 0,
+                    ValorUnitario = 1.60M
+                };
+                await _pricesRepository.CreateAsync(priceLine);
             }
+        }
 
-            // CriaÁ„o de um utilizador Admin por defeito
-            var powerUser = new IdentityUser
+
+        // M√©todo para criar clientes
+        private async Task CreateClients(IClientsRepository clientsRepository)
+        {
+            var _clientsRepository = clientsRepository;
+
+            var allClients = _clientsRepository.GetAll();
+            if (!allClients.Any())
             {
-                UserName = "admin@exemplo.com",
-                Email = "admin@exemplo.com",
-            };
+                var client = new Cliente
+                {
+                    Nome = "Teresa Silva",
+                    NIF = "234345678",
+                    MoradaFaturacao = "Rua das rosas, 33",
+                    ContactoTelefonico = "935142121",
+                    Email = "teresa.silva@gmail.com",
+                    NumeroCartaoCidadao = "125252522"
 
-            string adminPassword = "Admin@123";
-            var user = await userManager.FindByEmailAsync("admin@exemplo.com");
+                };
+                await _clientsRepository.CreateAsync(client);
 
+                client = new Cliente
+                {
+                    Nome = "Santos & Santos, Lda",
+                    NIF = "500125125",
+                    MoradaFaturacao = "Rua das lagoas, 133 armaz√©m A",
+                    ContactoTelefonico = "213456786",
+                    Email = "santos_santos@gmail.com",
+                    NumeroCartaoCidadao = ""
+
+                };
+                await _clientsRepository.CreateAsync(client);
+            }
+        }
+
+
+        // M√©todo para criar roles e usu√°rios padr√£o
+        private async Task CreateUsersAndRoles(IUserHelper userHelper)
+        {
+            var _userHelper = userHelper;
+
+            await _userHelper.CheckRoleAsync("Admin");
+            await _userHelper.CheckRoleAsync("Funcionario");
+            await _userHelper.CheckRoleAsync("Cliente");
+
+            //admin
+            var user = await _userHelper.GetUserByEmailAsync("pedro@gmail.com");
             if (user == null)
             {
-                var createPowerUser = await userManager.CreateAsync(powerUser, adminPassword);
-                if (createPowerUser.Succeeded)
+                user = new User
                 {
-                    // Atribui a role de Admin ao utilizador criado
-                    await userManager.AddToRoleAsync(powerUser, "Admin");
+                    FirstName = "Pedro",
+                    LastName = "Marques",
+                    Email = "pedro@gmail.com",
+                    UserName = "pedro@gmail.com",
+                    PhoneNumber = "212673409",
+                    Address = "Rua de Set√∫bal, 35"
+                };
+
+                var result = await _userHelper.AddUserAsync(user, "123456");
+
+                if (result != IdentityResult.Success)
+                {
+                    throw new InvalidOperationException("Couldn't create user in seeder");
                 }
+                await _userHelper.AddUserToRoleAsync(user, "Admin");
+                var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                await _userHelper.ConfirmEmailAsync(user, token);
             }
 
-            // CriaÁ„o de um utilizador Funcionario por defeito
-            var employeeUser = new IdentityUser
-            {
-                UserName = "funcionario@exemplo.com",
-                Email = "funcionario@exemplo.com",
-            };
+            var isInRole = await _userHelper.IsUserInRoleAsync(user, "Admin");
+            if (!isInRole)
+                await _userHelper.AddUserToRoleAsync(user, "Admin");
 
-            string employeePassword = "Funcionario@123";
-            var employee = await userManager.FindByEmailAsync("funcionario@exemplo.com");
 
-            if (employee == null)
+            //Funcionario
+            user = await _userHelper.GetUserByEmailAsync("funcionario@gmail.com");
+            if (user == null)
             {
-                var createEmployeeUser = await userManager.CreateAsync(employeeUser, employeePassword);
-                if (createEmployeeUser.Succeeded)
+                user = new User
                 {
-                    // Atribui a role de Funcionario ao utilizador criado
-                    await userManager.AddToRoleAsync(employeeUser, "Funcionario");
+                    FirstName = "Funcion√°rio",
+                    LastName = "Marques",
+                    Email = "funcionario@gmail.com",
+                    UserName = "funcionario@gmail.com",
+                    PhoneNumber = "212673409",
+                    Address = "Rua de Set√∫bal, 44"
+                };
+
+                var result = await _userHelper.AddUserAsync(user, "123456");
+
+                if (result != IdentityResult.Success)
+                {
+                    throw new InvalidOperationException("Couldn't create user in seeder");
                 }
+                await _userHelper.AddUserToRoleAsync(user, "Funcionario");
+                var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                await _userHelper.ConfirmEmailAsync(user, token);
             }
+
+            isInRole = await _userHelper.IsUserInRoleAsync(user, "Funcionario");
+            if (!isInRole)
+                await _userHelper.AddUserToRoleAsync(user, "Funcionario");
+
+            //Cliente
+            user = await _userHelper.GetUserByEmailAsync("cliente@gmail.com");
+            if (user == null)
+            {
+                user = new User
+                {
+                    FirstName = "Cliente",
+                    LastName = "Marques",
+                    Email = "cliente@gmail.com",
+                    UserName = "cliente@gmail.com",
+                    PhoneNumber = "212673409",
+                    Address = "Rua de Set√∫bal, 55"
+                };
+
+                var result = await _userHelper.AddUserAsync(user, "123456");
+
+                if (result != IdentityResult.Success)
+                {
+                    throw new InvalidOperationException("Couldn't create user in seeder");
+                }
+                await _userHelper.AddUserToRoleAsync(user, "Cliente");
+                var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                await _userHelper.ConfirmEmailAsync(user, token);
+            }
+
+            isInRole = await _userHelper.IsUserInRoleAsync(user, "Cliente");
+            if (!isInRole)
+                await _userHelper.AddUserToRoleAsync(user, "Cliente");
         }
+
+
     }
 }
-
-
-
-

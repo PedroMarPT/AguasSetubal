@@ -1,36 +1,46 @@
-﻿using System;
+﻿using AguasSetubal.Data;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace AguasSetubal.Models
 {
-    public class LeituraContador
+    public class LeituraContador : IEntity
     {
         public int Id { get; set; }
-        public decimal LeituraAnterior { get; set; } // Mantido
-        public decimal LeituraAtual { get; set; } // Corrigido para decimal
-        public decimal Valor { get; set; }
+
+        [Required(ErrorMessage = "Leitura anterior é de preenchimento obrigatório")]
+        [Display(Name = "Leitura anterior")]
+        public decimal LeituraAnterior { get; set; }
+
+        [Required(ErrorMessage = "Leitura atual é de preenchimento obrigatório")]
+        [Display(Name = "Leitura atual")]
+        public decimal LeituraAtual { get; set; }
+
+        [Required(ErrorMessage = "Consumo é de preenchimento obrigatório")]
+        [Display(Name = "Consumo")]
         public decimal Consumo { get; set; }
+
+        [Required(ErrorMessage = "Data da leitura é de preenchimento obrigatório")]
+        [Display(Name = "Data da leitura")]
         public DateTime DataLeitura { get; set; }
-        public int ClienteId { get; set; }
+
+        [Display(Name = "Está faturado?")]
+        public bool IsInvoiced { get; set; }
+
+        [Required(ErrorMessage = "Cliente é de preenchimento obrigatório")]
+        public int? ClienteId { get; set; }
+
+        public int? FaturaId { get; set; }
+
+        [Required(ErrorMessage = "Contador é de preenchimento obrigatório")]
+        public int ContadorId { get; set; }
+
+        public Contador Contador { get; set; }
+
+        public Fatura Fatura { get; set; }
+
         public Cliente Cliente { get; set; }
-        public DateTime DataLeituraAnterior { get; set; }
-        public decimal ValorPagar { get; set; }
-        public decimal M3Gastos { get; set; } // Consumo calculado (LeituraAtual - LeituraAnterior)
-
-        public void CalcularValorPagar()
-            {
-                // Lógica de cálculo do valor a pagar
-            }
-
-            // Propriedade de navegação para Fatura
-            public Fatura Fatura { get; set; }
-        
 
     }
 }
-
-
-
-
-
-
-

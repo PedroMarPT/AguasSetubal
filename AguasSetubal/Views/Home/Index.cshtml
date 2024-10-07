@@ -36,37 +36,121 @@
 
 <div class="text-center mt-4">
     <h1 class="display-4 text-primary">Bem-vindo ao Sistema de Gestão de Águas de Setúbal</h1>
-    <p class="lead">Escolha uma das opções abaixo para começar a gerir o sistema:</p>
 
-    <div class="row justify-content-center mt-5">
-        <!-- Card para Gerir Faturas -->
-        <div class="col-md-4 mb-4 d-flex">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title text-secondary">
-                        <i class="fas fa-file-invoice"></i> <!-- Ícone de Faturas -->
-                        Gerir Faturas
-                    </h5>
-                    <p class="card-text">Aceda ao módulo de faturas para criar, editar ou visualizar faturas.</p>
-                    <a href="/Invoices" class="btn btn-outline-primary btn-block mt-auto">Ir para Faturas</a>
+    @if (this.User.Identity.IsAuthenticated)
+    {
+        <p class="lead">Escolha uma das opções abaixo para começar a gerir o sistema:</p>
+
+        @if (ViewBag.NewCounters != null && this.User.IsInRole("Funcionario"))
+        {
+            <div class="row justify-content-center mt-5">
+                <div class="alert alert-danger" role="alert">
+                    Atenção, existem @ViewBag.NewCounters novas requisições de contadores
+                </div>
+            </div>
+        }
+
+        <div class="row justify-content-center mt-5">
+            @if (this.User.IsInRole("Funcionario"))
+            {
+                <!-- Card para Gerir Contadores -->
+                <div class="col-md-3 mb-3 d-flex">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title text-secondary">
+                                <i class="fa fa-database"></i> <!-- Ícone de Contadores -->
+                                Gerir Contadores
+                            </h5>
+                            <p class="card-text">Aceda ao módulo de gestão de contadores para criar, editar ou visualizar.</p>
+                            <a href="/Contador" class="btn btn-outline-primary btn-block mt-auto">Ir para Contadores</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card para Gerir Consumos -->
+                <div class="col-md-3 mb-3 d-flex">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title text-secondary">
+                                <i class="fa fa-calculator"></i> <!-- Ícone de Consumos -->
+                                Gerir Consumos
+                            </h5>
+                            <p class="card-text">Aceda ao módulo de gestão de consumos para criar, editar ou visualizar.</p>
+                            <a href="/LeituraContador" class="btn btn-outline-primary btn-block mt-auto">Ir para Leituras</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card para Gerir Faturas -->
+                <div class="col-md-3 mb-3 d-flex">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title text-secondary">
+                                <i class="fas fa-file-invoice"></i> <!-- Ícone de Faturas -->
+                                Gerir Faturação
+                            </h5>
+                            <p class="card-text">Aceda ao módulo de faturas para criar, editar ou visualizar faturas.</p>
+                            <a href="/Invoices" class="btn btn-outline-primary btn-block mt-auto">Ir para Faturas</a>
+                        </div>
+                    </div>
+                </div>
+            }
+            @if (this.User.IsInRole("Cliente"))
+            {
+                <!-- Card para Gerir Faturas -->
+                <div class="col-md-4 mb-4 d-flex">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title text-secondary">
+                                <i class="fas fa-file-invoice"></i> <!-- Ícone de Faturas -->
+                                Gerir Faturação
+                            </h5>
+                            <p class="card-text">Aceda ao módulo de faturas para criar, editar ou visualizar faturas.</p>
+                            <a href="/Invoices?id=@this.User.Identity.Name" class="btn btn-outline-primary btn-block mt-auto">Ir para Faturas</a>
+                        </div>
+                    </div>
+                </div>
+            }
+            @if (this.User.IsInRole("Admin"))
+            {
+                <!-- Card para Gerir Clientes -->
+                <div class="col-md-4 mb-4 d-flex">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title text-secondary">
+                                <i class="fas fa-users"></i> <!-- Ícone de Clientes -->
+                                Gerir Clientes
+                            </h5>
+                            <p class="card-text">Aceda ao módulo de clientes para criar, editar ou visualizar informações dos clientes.</p>
+                            <a href="/Clients" class="btn btn-outline-primary btn-block mt-auto">Ir para Clientes</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        @if (ViewBag.Message != null)
+        {
+            <div class="row justify-content-center mt-5">
+                <div class="alert alert-success" role="alert">
+                    @ViewBag.Message
+                </div>
+            </div>
+        }
+        <div class="row justify-content-center mt-5">
+            <!-- Card para Utlizadores anónimos -->
+            <div class="col-md-4 mb-4 d-flex">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-secondary">
+                            <i class="fas fa-users"></i>
+                            Contadores
+                        </h5>
+                        <p class="card-text">Solicitar pedido para novos contadores.</p>
+                        <a href="/RequisicaoContador/Create" class="btn btn-outline-primary btn-block mt-auto">Efetuar pedido</a>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- Card para Gerir Clientes -->
-        <div class="col-md-4 mb-4 d-flex">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title text-secondary">
-                        <i class="fas fa-users"></i> <!-- Ícone de Clientes -->
-                        Gerir Clientes
-                    </h5>
-                    <p class="card-text">Aceda ao módulo de clientes para criar, editar ou visualizar informações dos clientes.</p>
-                    <a href="/Clients" class="btn btn-outline-primary btn-block mt-auto">Ir para Clientes</a>
-                </div>
-            </div>
-        </div>
-    </div>
+    }
 </div>
-
-

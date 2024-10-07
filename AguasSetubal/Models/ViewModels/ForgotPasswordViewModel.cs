@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace YourNamespace.ViewModels
+namespace AguasSetubal.ViewModels
 {
     public class ForgotPasswordViewModel
     {

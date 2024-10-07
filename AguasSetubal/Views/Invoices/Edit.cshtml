@@ -1,101 +1,87 @@
 ﻿@model AguasSetubal.Models.Fatura
 
-@{
-    ViewData["Title"] = "Editar Fatura";
-}
-
-<div class="container mt-5">
+<div class="container-fluid mt-4">
     <div class="row">
-        <div class="col-12">
-            <h1 class="display-4 text-primary">@ViewData["Title"]</h1>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card shadow-lg mt-3">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-lg mt-3 scroll">
                 <div class="card-body">
-                    <h4>Detalhes da Fatura</h4>
+                    <h4>Editar fatura</h4>
                     <hr />
-                    <form asp-action="Edit" enctype="multipart/form-data">
-                        <input type="hidden" asp-for="Id" />
-                        <input type="hidden" asp-for="LeituraContadorId" />
-                        <input type="hidden" asp-for="DataEmissao" />
-                        <input type="hidden" asp-for="Endereco" />
-
-                        <!-- Campo Cliente -->
-                        <div class="form-group">
-                            <label asp-for="ClienteId" class="control-label">Cliente</label>
-                            <select asp-for="ClienteId" class="form-control" asp-items="ViewBag.Clientes" style="line-height: normal;"></select>
+                    <div class="row" id="createFaturaDiv">
+                        <div class="col-md-8">
+                            <form asp-action="Edit" enctype="multipart/form-data">
+                                <input type="hidden" asp-for="Id" />
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <label asp-for="ClienteId" class="control-label">Selecione o cliente</label>
+                                    <select asp-for="ClienteId" class="form-control" asp-items="ViewBag.Clientes"></select>
+                                    <span asp-validation-for="ClienteId" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="ContadorId" class="control-label">Selecione o contador</label>
+                                    <select asp-for="ContadorId" class="form-control" asp-items="ViewBag.Contadores"></select>
+                                    <span asp-validation-for="ContadorId" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="DataInicio" class="control-label"></label>
+                                    <input asp-for="DataInicio" class="form-control" />
+                                    <span asp-validation-for="DataInicio" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="DataFim" class="control-label"></label>
+                                    <input asp-for="DataFim" class="form-control" />
+                                    <span asp-validation-for="DataFim" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <input type="submit" value="Gravar" class="btn btn-primary" />
+                                    <a asp-action="Index">Back to List</a>
+                                </div>
+                            </form>
                         </div>
-
-                        <!-- Campo Leitura Anterior -->
-                        <div class="form-group">
-                            <label asp-for="LeituraAnterior" class="control-label">Leitura Anterior</label>
-                            <input asp-for="LeituraAnterior" class="form-control" />
-                        </div>
-
-                        <!-- Campo Leitura Atual -->
-                        <div class="form-group">
-                            <label asp-for="LeituraAtual" class="control-label">Leitura Atual</label>
-                            <input asp-for="LeituraAtual" class="form-control" />
-                        </div>
-
-                        <!-- Botão de Submissão -->
-                        <div class="form-group mt-4">
-                            <input type="submit" value="Guardar" class="btn btn-primary btn-lg" />
-                            <a asp-action="Index" class="btn btn-secondary btn-lg ml-2">Voltar à Lista</a>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    .container {
-        max-width: 100%;
-        padding: 0 15px;
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
 
-    .card {
-        width: 100%;
-        border-radius: 10px;
-    }
+        $('#createFaturaDiv #ClienteId').on('change', function (e) {
+            GetCountersByClientId($(this).val());
+        });
 
-    .card-body {
-        padding: 20px;
-    }
+        GetCountersByClientId($('#createFaturaDiv #ClienteId').val());
 
-    .form-group label {
-        font-weight: bold;
-    }
 
-    .form-control {
-        border-radius: 5px;
-        font-size: 1rem;
-        padding: 10px;
-    }
+        function GetCountersByClientId(clientId) {
 
-    select.form-control {
-        line-height: 1.5; /* Ajusta o espaçamento entre linhas do select */
-        padding: 8px; /* Ajusta o padding interno do select */
-    }
+            $("#ContadorId").empty();
+            $.ajax({
+                url: '@Url.Action("GetCountersByClientId", "LeituraContador")',
+                method: 'POST',
+                data: { clientId: clientId },
+                success: function (response) {
 
-    .btn-lg {
-        font-size: 1.125rem;
-        padding: 10px 20px;
-    }
-
-    .btn-secondary {
-        background-color: #6c757d;
-        border-color: #6c757d;
-        transition: background-color 0.3s ease;
-    }
-
-        .btn-secondary:hover {
-            background-color: #5a6268;
-            border-color: #545b62;
+                    $.each(response, function (i, counter) {
+                        $("#ContadorId").append('<option value="'
+                            + counter.value + '">'
+                            + counter.text + '</option>');
+                    });
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve counters.' + ex);
+                }
+            });
         }
-</style>
 
+    });
+
+</script>

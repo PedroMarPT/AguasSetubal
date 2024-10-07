@@ -1,119 +1,45 @@
 ﻿@model AguasSetubal.Models.Fatura
 
-@{
-    ViewData["Title"] = "Detalhes da Fatura";
-}
-
-<div class="container mt-5">
+<div class="container-fluid mt-4">
     <div class="row">
-        <div class="col-12">
-            <h1 class="display-4 text-primary">@ViewData["Title"]</h1>
-        </div>
-    </div>
-
-    <div class="row mt-4">
-        <div class="col-md-8">
-            <div class="card shadow-lg">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-lg mt-3 scroll">
                 <div class="card-body">
-                    <h4 class="card-title">Detalhes da Fatura</h4>
+                    <h4>Detalhes da fatura</h4>
                     <hr />
+                    <div class="invoice">
+                        <h1 class="text-center company-name">Águas de Setúbal</h1>
+                        <h2 class="text-center invoice-title">Fatura para Pagamento</h2>
 
-                    <dl class="row">
-                        <!-- Nome do Cliente -->
-                        <dt class="col-sm-4 font-weight-bold">
-                            @Html.DisplayNameFor(model => model.Cliente.Nome)
-                        </dt>
-                        <dd class="col-sm-8">
-                            @Html.DisplayFor(model => model.Cliente.Nome)
-                        </dd>
+                        <div class="invoice-details">
+                            <p><strong>Nome do Cliente:</strong> @Model.Cliente.Nome</p>
+                            <p><strong>Nº contrato:</strong> @Model.Contador.NumeroContrato</p>
+                            <p><strong>Nº contador:</strong> @Model.Contador.NumeroContador</p>
+                            <p><strong>Endereço:</strong> @Model.Contador.MoradaLocal</p>
+                            <p><strong>Data de Emissão:</strong> @Model.DataEmissao.ToString("dd/MM/yyyy")</p>
+                            <br />
+                            <br />
+                            <hr />
+                            <p><strong>Escalão:</strong> @Model.Descritivo</p>
+                            <p><strong>Consumo:</strong> @Model.ConsumoTotal</p>
+                            <p><strong>Valor unitário:</strong> @Model.ValorUnitario</p>
+                            <p><strong>Valor Total:</strong> @Model.ValorTotal</p>
+                            <hr />
+                            <br />
+                            <br />
+                            @* Adicionando as linhas de Entidade e Referência *@
+                            <p><strong>Entidade:</strong> 100 200 300</p>
+                            <p><strong>Referência:</strong> 25 36 @Model.Id</p>
+                            <p><strong>Valor Total a Pagar (€):</strong> @Model.ValorTotal.ToString("F2")</p>
+                            <p><strong>Referência Interna:</strong> STB-@Model.Id</p>
+                        </div>
+                    </div>
 
-                        <!-- Endereço do Cliente -->
-                        <dt class="col-sm-4 font-weight-bold">
-                            @Html.DisplayNameFor(model => model.Endereco)
-                        </dt>
-                        <dd class="col-sm-8">
-                            @Html.DisplayFor(model => model.Endereco)
-                        </dd>
-
-                        <!-- Leitura Anterior -->
-                        <dt class="col-sm-4 font-weight-bold">
-                            @Html.DisplayNameFor(model => model.LeituraAnterior)
-                        </dt>
-                        <dd class="col-sm-8">
-                            @Html.DisplayFor(model => model.LeituraAnterior)
-                        </dd>
-
-                        <!-- Leitura Atual -->
-                        <dt class="col-sm-4 font-weight-bold">
-                            @Html.DisplayNameFor(model => model.LeituraAtual)
-                        </dt>
-                        <dd class="col-sm-8">
-                            @Html.DisplayFor(model => model.LeituraAtual)
-                        </dd>
-
-                        <!-- M3 Gastos -->
-                        <dt class="col-sm-4 font-weight-bold">
-                            @Html.DisplayNameFor(model => model.M3Gastos)
-                        </dt>
-                        <dd class="col-sm-8">
-                            @Html.DisplayFor(model => model.M3Gastos)
-                        </dd>
-
-                        <!-- Data de Emissão -->
-                        <dt class="col-sm-4 font-weight-bold">
-                            @Html.DisplayNameFor(model => model.DataEmissao)
-                        </dt>
-                        <dd class="col-sm-8">
-                            @Html.DisplayFor(model => model.DataEmissao)
-                        </dd>
-
-                        <!-- Valor Total a Pagar -->
-                        <dt class="col-sm-4 font-weight-bold">Valor Total a Pagar (€)</dt>
-                        <dd class="col-sm-8">
-                            @{
-                                // Calculando o valor total e o escalão
-                                decimal consumo = Model.M3Gastos;
-                                decimal valorTotal = 0.0M;
-                                string escalao = "Escalão 1";
-
-                                if (consumo <= 5)
-                                {
-                                    valorTotal = consumo * 0.30M;
-                                    escalao = "Escalão 1";
-                                }
-                                else if (consumo <= 15)
-                                {
-                                    valorTotal = (5 * 0.30M) + ((consumo - 5) * 0.80M);
-                                    escalao = "Escalão 2";
-                                }
-                                else if (consumo <= 25)
-                                {
-                                    valorTotal = (5 * 0.30M) + (10 * 0.80M) + ((consumo - 15) * 1.20M);
-                                    escalao = "Escalão 3";
-                                }
-                                else
-                                {
-                                    valorTotal = (5 * 0.30M) + (10 * 0.80M) + (10 * 1.20M) + ((consumo - 25) * 1.60M);
-                                    escalao = "Escalão 4";
-                                }
-
-                                @valorTotal.ToString("F2")
-                            }
-                        </dd>
-
-                        <!-- Escalão correspondente -->
-                        <dt class="col-sm-4 font-weight-bold">Escalão</dt>
-                        <dd class="col-sm-8">
-                            @escalao
-                        </dd>
-                    </dl>
-
-                    <!-- Link de retorno -->
                     <div class="mt-4">
-                        <a href="@Url.Action("ImprimirFatura", new { id = Model.Id })" class="btn btn-success btn-lg">
-                            Fatura para Pagamento
+                        <a href="@Url.Action("ImprimirFatura", new { id = Model.Id })" target="_blank" class="btn btn-success btn-lg">
+                            Imprimir
                         </a>
-                        <a href="@Url.Action("Index", "Invoices")" class="btn btn-primary btn-lg">Voltar para Lista de Faturas</a>
+                        <a asp-action="Index">Back to List</a>
                     </div>
                 </div>
             </div>
@@ -122,33 +48,42 @@
 </div>
 
 <style>
-    .container {
-        max-width: 100%;
-        padding: 0 15px;
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #e6f2ff; /* Tom suave de azul */
     }
 
-    .card {
+    .invoice {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ddd;
         border-radius: 10px;
+        background-color: #f9f9f9;
+    }
+
+    .company-name {
+        color: #004080; /* Azul marinho */
+        font-size: 2.5rem; /* Tamanho maior que o título da fatura */
+        margin-bottom: 0; /* Remove espaço embaixo */
+    }
+
+    .invoice-title {
+        color: #2E8B57; /* Verde marinho */
+        font-size: 2rem; /* Tamanho ligeiramente menor que o nome da empresa */
+        margin-top: 0; /* Remove espaço acima */
+    }
+
+    .invoice-details {
         margin-top: 20px;
     }
 
-    .card-body {
-        padding: 20px;
-    }
+        .invoice-details p {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
 
-    .row dt, .row dd {
-        padding: 10px 0;
-    }
-
-    .font-weight-bold {
-        font-weight: bold;
-    }
-
-    .btn-lg {
-        font-size: 1.125rem;
-        padding: 10px 20px;
+    .text-center {
+        text-align: center;
     }
 </style>
-
-
-

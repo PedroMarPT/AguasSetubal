@@ -5,24 +5,34 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AguasSetubal.Data;
 using AguasSetubal.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using AguasSetubal.Helpers;
+using Syncfusion.XPS;
 
 namespace AguasSetubal.Controllers
 {
     public class ClientsController : Controller
     {
         private readonly IClientsRepository _clientsRepository;
+        private readonly IUserHelper _userHelper;
 
-        public ClientsController(IClientsRepository clientsRepository)
+        public ClientsController(IClientsRepository clientsRepository, IUserHelper userHelper)
         {
             this._clientsRepository = clientsRepository;
+            _userHelper = userHelper;
         }
 
+        [Authorize]
+        [Authorize(Roles = "Admin")]
         // GET: Clientes
         public IActionResult Index()
         {
             return View(_clientsRepository.GetAll());
         }
 
+        [Authorize]
+        [Authorize(Roles = "Admin")]
         // GET: Clientes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -40,12 +50,23 @@ namespace AguasSetubal.Controllers
             return View(cliente);
         }
 
+        [Authorize]
+        [Authorize(Roles = "Admin")]
         // GET: Clientes/Create
-        public IActionResult Create()
+        public async Task<IActionResult> CreateAsync()
         {
+            var usersList = await _userHelper.GetUsersWithRoleClienteAsync();
+
+            var drpList = new SelectList(String.Empty, String.Empty);
+            drpList.Union(new SelectList(usersList, "Id", "UserName"));
+
+            ViewBag.Utilizadores = drpList;
+
             return View();
         }
 
+        [Authorize]
+        [Authorize(Roles = "Admin")]
         // POST: Clientes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -60,6 +81,8 @@ namespace AguasSetubal.Controllers
             return View(cliente);
         }
 
+        [Authorize]
+        [Authorize(Roles = "Admin")]
         // GET: Clientes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -76,6 +99,8 @@ namespace AguasSetubal.Controllers
             return View(cliente);
         }
 
+        [Authorize]
+        [Authorize(Roles = "Admin")]
         // POST: Clientes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -108,6 +133,8 @@ namespace AguasSetubal.Controllers
             return View(cliente);
         }
 
+        [Authorize]
+        [Authorize(Roles = "Admin")]
         // GET: Clientes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -125,6 +152,8 @@ namespace AguasSetubal.Controllers
             return View(cliente);
         }
 
+        [Authorize]
+        [Authorize(Roles = "Admin")]
         // POST: Clientes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -138,7 +167,3 @@ namespace AguasSetubal.Controllers
 
     }
 }
-
-
-
-

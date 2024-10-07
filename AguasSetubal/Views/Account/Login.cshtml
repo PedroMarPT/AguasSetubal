@@ -1,35 +1,55 @@
-﻿@model YourNamespace.ViewModels.LoginViewModel
+﻿@model AguasSetubal.ViewModels.LoginViewModel
 
 @{
-    ViewData["Title"] = "Iniciar Sessão";
+    ViewData["Title"] = "Iniciar SessÃ£o";
 }
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-4 offset-md-4">
+            <div class="card shadow-lg mt-3">
+                <div class="card-body">
+                    <h2 class="display-4 text-primary">@ViewData["Title"]</h2>
 
-<div class="container mt-5">
-    <h1 class="display-4 text-primary">@ViewData["Title"]</h1>
+                    <div class="card shadow-lg mt-3">
+                        <div class="card-body">
+                            <form method="post">
+                                <div asp-validation-summary="ModelOnly"></div>
 
-    <div class="card shadow-lg mt-3">
-        <div class="card-body">
-            <form asp-action="Login" method="post">
-                <div class="form-group">
-                    <label asp-for="Email" class="control-label">Email</label>
-                    <input asp-for="Email" class="form-control" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
+                                <div class="form-group">
+                                    <label asp-for="Username">Username</label>
+                                    <input asp-for="Username" class="form-control" />
+                                    <span asp-validation-for="Username" class="text-warning"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="Password">Password</label>
+                                    <input asp-for="Password" type="password" class="form-control" />
+                                    <span asp-validation-for="Password" class="text-warning"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="form-check">
+                                        <input asp-for="RememberMe" type="checkbox" class="form-check-input" />
+                                        <label asp-for="RememberMe" class="form-check-label">Remember Me?</label>
+                                    </div>
+                                    <span asp-validation-for="RememberMe" class="text-warning"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <input type="submit" value="Login" class="btn btn-primary" />
+                                    @if (!this.User.IsInRole("Anonimo"))
+                                    {
+                                        <a asp-action="RecoverPassword" class="btn btn-link">Forgot your password?</a>
+                                    }
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label asp-for="Password" class="control-label">Palavra-Passe</label>
-                    <input asp-for="Password" class="form-control" type="password" />
-                    <span asp-validation-for="Password" class="text-danger"></span>
-                </div>
-                <div class="form-group form-check">
-                    <input asp-for="RememberMe" class="form-check-input" type="checkbox" />
-                    <label asp-for="RememberMe" class="form-check-label">Lembrar-me?</label>
-                </div>
-                <button type="submit" class="btn btn-primary">Iniciar Sessão</button>
-            </form>
+            </div>
         </div>
     </div>
 </div>
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
@@ -80,4 +100,3 @@
         font-size: 0.9em;
     }
 </style>
-

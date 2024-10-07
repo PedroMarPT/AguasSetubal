@@ -1,22 +1,23 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace YourNamespace.ViewModels
+namespace AguasSetubal.ViewModels
 {
     public class ResetPasswordViewModel
     {
         [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+        public string Username { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
+        [Required]
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        [Compare("Password")]
         public string ConfirmPassword { get; set; }
 
-        public string Code { get; set; }
+        [Required]
+        public string Token { get; set; }
+
     }
 }

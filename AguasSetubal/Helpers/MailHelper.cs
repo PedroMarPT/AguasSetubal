@@ -1,13 +1,11 @@
-﻿using MailKit.Security;
-using Microsoft.AspNetCore.Identity;
+﻿using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using MimeKit;
-using MimeKit.Text;
-using System.Net;
 using System;
-using System.Net.Mail;
-using MailKit.Net.Smtp;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace AguasSetubal.Helpers
 {
@@ -21,35 +19,52 @@ namespace AguasSetubal.Helpers
             _configuration = configuration;
         }
 
-        public void SendEmail(string to, string subject, string body)
+        public Response SendEmail(string to, string subject, string body)
         {
-            var nameFrom = _configuration["Mail: NameFrom"];
-            var from = _configuration["Mail: From"];
-            var smtp = _configuration["Mail: Smtp"];
-            var port = _configuration["Mail: Port"];
-            var password = _configuration["Mail: Password"];
 
-            var message = new MailMessage();
-            message.From = new MailAddress(nameFrom, from);
-            message.To.Add(new MailAddress(to, to));
+            var nameFrom = _configuration["Mail:NameFrom"];
+            var from = _configuration["Mail:From"];
+            var smtp = _configuration["Mail:Smtp"];
+            var port = _configuration["Mail:Port"];
+            var password = _configuration["Mail:Password"];
+
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(nameFrom, from));
+            message.To.Add(new MailboxAddress(to, to));
             message.Subject = subject;
 
-            var bodyBuilder = new BodyBuilder
+            var bodybuilder = new BodyBuilder
             {
-                HtmlBody = body
+                HtmlBody = body,
             };
+            message.Body = bodybuilder.ToMessageBody();
 
-            message.Body = body ?? "";
-            message.IsBodyHtml = true;
-
-            using (var client = new System.Net.Mail.SmtpClient(smtp, int.Parse(port)))
+            try
             {
-                client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential(from, password);
-                client.EnableSsl = false;
-                client.Send(message);
+                using (var client = new SmtpClient())
+                {
+                    client.Connect(smtp, int.Parse(port), false);
+                    client.Authenticate(from, password);
+                    client.Send((MimeMessage)message);
+                    client.Disconnect(true);
+                }
+            }
+            //try
+            //{
+            //    using (var client = new System.Net.Mail.SmtpClient(smtp, int.Parse(port)))
+            //    {
+            //        client.UseDefaultCredentials = false;
+            //        client.Credentials = new NetworkCredential(from, password);
+            //        client.EnableSsl = false;
+            //        client.Send(message);
+            //    }
+            //}
+            catch (Exception ex)
+            {
+                return new Response { IsSuccess = false, Message = ex.ToString() };
             }
 
+            return new Response { IsSuccess = true };
         }
     }
 }

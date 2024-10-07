@@ -1,0 +1,59 @@
+﻿@model AguasSetubal.Models.LeituraContador
+
+@{
+    ViewData["Title"] = "Edit";
+}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-lg mt-3 scroll">
+                <div class="card-body">
+                    <h4>Editar a Leitura do Contador</h4>
+                    <hr />
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+                        <div class="form-group">
+                            <label asp-for="LeituraAnterior" class="control-label"></label>
+                            <input asp-for="LeituraAnterior" class="form-control" />
+                            <span asp-validation-for="LeituraAnterior" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="LeituraAtual" class="control-label"></label>
+                            <input asp-for="LeituraAtual" class="form-control" />
+                            <span asp-validation-for="LeituraAtual" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Consumo" class="control-label"></label>
+                            <input asp-for="Consumo" class="form-control" />
+                            <span asp-validation-for="Consumo" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="DataLeitura" class="control-label"></label>
+                            <input asp-for="DataLeitura" class="form-control" />
+                            <span asp-validation-for="DataLeitura" class="text-danger"></span>
+                        </div>
+                        <div class="form-group form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" asp-for="IsInvoiced" /> @Html.DisplayNameFor(model => model.IsInvoiced)
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="FaturaId" class="control-label"></label>
+                            <select asp-for="FaturaId" class="form-control" asp-items="ViewBag.FaturaId"></select>
+                            <span asp-validation-for="FaturaId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="ContadorId" class="control-label"></label>
+                            <select asp-for="ContadorId" class="form-control" asp-items="ViewBag.ContadorId"></select>
+                            <span asp-validation-for="ContadorId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" value="Save" class="btn btn-primary" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,41 +1,130 @@
 ﻿@model AguasSetubal.Models.LeituraContador
 
-@{
-    ViewData["Title"] = "Nova Leitura";
-}
-
-<div class="container-fluid mt-5">
+<div class="container-fluid mt-4">
     <div class="row">
-        <div class="col-12 d-flex justify-content-between align-items-center">
-            <h1 class="display-4 text-primary">@ViewData["Title"]</h1>
-            <a asp-action="Index" class="btn btn-secondary btn-lg">Cancelar</a>
-        </div>
-        <div class="col-lg-8 col-md-10 col-sm-12 mx-auto mt-4">
-            <div class="card shadow-lg">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-lg mt-3 scroll">
                 <div class="card-body">
-                    <h4 class="card-title text-center">Dados do Cliente</h4>
+                    <h4>Registar nova leitura do contador</h4>
                     <hr />
-                    <div class="mb-4">
-                        <p><strong>Cliente:</strong> @Model.Cliente.Nome</p>
-                        <p><strong>Leitura Anterior:</strong> @Model.LeituraAnterior m³</p>
+                    <div class="row" id="createLeituraDiv">
+                        <div class="col-md-8">
+                            <form asp-action="Create">
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group">
+                                    <label asp-for="ClienteId" class="control-label">Selecione o cliente</label>
+                                    <select asp-for="ClienteId" class="form-control" asp-items="ViewBag.Clientes"></select>
+                                    <span asp-validation-for="ClienteId" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="ContadorId" class="control-label">Selecione o contador</label>
+                                    <select asp-for="ContadorId" class="form-control" asp-items="ViewBag.Contadores"></select>
+                                    <span asp-validation-for="ContadorId" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="LeituraAnterior" class="control-label"></label>
+                                    <input asp-for="LeituraAnterior" class="form-control" readonly="readonly" />
+                                    <span asp-validation-for="LeituraAnterior" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="LeituraAtual" class="control-label"></label>
+                                    <input asp-for="LeituraAtual" class="form-control" />
+                                    <span asp-validation-for="LeituraAtual" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Consumo" class="control-label"></label>
+                                    <input asp-for="Consumo" class="form-control" readonly="readonly" />
+                                    <span asp-validation-for="Consumo" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="DataLeitura" class="control-label"></label>
+                                    <input asp-for="DataLeitura" class="form-control" />
+                                    <span asp-validation-for="DataLeitura" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <input type="submit" value="Create" class="btn btn-primary" />
+                                    <a asp-action="Index">Back to List</a>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                    <form asp-action="Create">
-                        <div class="form-group">
-                            <label asp-for="Valor" class="control-label">Leitura Atual (m³)</label>
-                            <input asp-for="Valor" class="form-control form-control-lg" />
-                            <span asp-validation-for="Valor" class="text-danger"></span>
-                        </div>
-
-                        <input type="hidden" asp-for="ClienteId" />
-
-                        <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg">Salvar</button>
-                            <a asp-action="Index" class="btn btn-secondary btn-lg">Cancelar</a>
-                        </div>
-                    </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        $('#createLeituraDiv #ClienteId').on('change', function (e) {
+            GetCountersByClientId($(this).val());
+        });
+
+        GetCountersByClientId($('#createLeituraDiv #ClienteId').val());
+
+        $('#createLeituraDiv #ContadorId').on('change', function (e) {
+            GetLastReadingByContadorId($(this).val());
+        });
+
+        $('#createLeituraDiv #LeituraAtual').on('change', function (e) {
+
+            var consumo = parseFloat($('#LeituraAtual').val()) - parseFloat($('#LeituraAnterior').val());
+            if(consumo > 0){
+                $('#Consumo').val(consumo);
+            }else{
+                $('#LeituraAtual').val('');
+            }
+        });
+
+        $('#createLeituraDiv #LeituraAtual').on('keyup', function () {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        function GetLastReadingByContadorId(contadorId) {
+
+            $.ajax({
+                url: '@Url.Action("GetLastReadingByContadorId", "LeituraContador")',
+                method: 'POST',
+                data: { contadorId: contadorId },
+            }).done(function (response) {
+                $('#LeituraAnterior').val(response.lastReading);
+                $('#Consumo').val(response.lastReading);
+            });
+        }
+
+        function GetCountersByClientId(clientId) {
+
+            $("#ContadorId").empty();
+            $.ajax({
+                url: '@Url.Action("GetCountersByClientId", "LeituraContador")',
+                method: 'POST',
+                data: { clientId: clientId },
+                success: function (response) {
+
+                    $.each(response, function (i, counter) {
+                        $("#ContadorId").append('<option value="'
+                            + counter.value + '">'
+                            + counter.text + '</option>');
+                    });
+                },
+                error: function (ex) {
+                    alert('Failed to retrieve counters.' + ex);
+                }
+            });
+        }
+
+    });
+
+</script>
