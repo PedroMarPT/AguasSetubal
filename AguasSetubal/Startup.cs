@@ -32,7 +32,6 @@ namespace AguasSetubal
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddIdentity<User, IdentityRole>(cfg =>
@@ -67,13 +66,9 @@ namespace AguasSetubal
             {
                 cfg.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection"));
             });
+            services.AddHttpClient();
 
-            //services.AddFlashMessage();
-
-            services.AddTransient<SeedDb>();                                             // Creates an object, and when it's deleted, it can't be created again
-            //services.AddScoped<IBlobHelper, BlobHelper>();
-            //services.AddScoped<IConverterHelper, ConverterHelper>();
-
+            services.AddTransient<SeedDb>();
             services.AddScoped<IUserHelper, UserHelper>();
             services.AddScoped<IClientsRepository, ClientsRepository>();
             services.AddScoped<IInvoicesRepository, InvoicesRepository>();
@@ -103,7 +98,6 @@ namespace AguasSetubal
             else
             {
                 app.UseExceptionHandler("/Errors/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -133,8 +127,6 @@ namespace AguasSetubal
             // Chama o método para criar tabela preços inicial
             CreatePrices(pricesRepository).Wait();
         }
-
-
         // Método para criar clientes tabela preços inicial
         private async Task CreatePrices(IPricesRepository pricesRepository)
         {
@@ -179,8 +171,6 @@ namespace AguasSetubal
                 await _pricesRepository.CreateAsync(priceLine);
             }
         }
-
-
         // Método para criar clientes
         private async Task CreateClients(IClientsRepository clientsRepository)
         {
@@ -214,8 +204,6 @@ namespace AguasSetubal
                 await _clientsRepository.CreateAsync(client);
             }
         }
-
-
         // Método para criar roles e usuários padrão
         private async Task CreateUsersAndRoles(IUserHelper userHelper)
         {
@@ -313,7 +301,5 @@ namespace AguasSetubal
             if (!isInRole)
                 await _userHelper.AddUserToRoleAsync(user, "Cliente");
         }
-
-
-    }
+    }    
 }

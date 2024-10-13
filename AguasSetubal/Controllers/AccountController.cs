@@ -173,14 +173,31 @@ namespace AguasSetubal.Controllers
                         token = myToken
                     }, protocol: HttpContext.Request.Scheme);
 
+                    string mensagem = $@"
+                    <html>
+                        <body style='font-family: Arial, sans-serif; color: #333;'>
+                            <h1 style='color: #4CAF50; text-align: center;'>Confirmação de E-mail</h1>
+                            <p>Olá <strong>{model.Username}</strong>,</p>
+                            <p>Para confirmar seu e-mail e ativar sua conta, por favor clique no link abaixo:</p>
+                            <p style='text-align: center;'>
+                                <a href='{tokenLink}' style='background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;'>Confirmar E-mail</a>
+                            </p>
+                            <br />
+                            <p>Se você não se registrou em nossa plataforma, por favor, ignore este e-mail.</p>
+                            <hr style='border: 1px solid #ccc;' />
+                            <p style='font-size: 12px; color: #888;'>Esta é uma mensagem automática, por favor, não responda.</p>
+                        </body>
+                    </html>";
 
-                    Response response = _mailHelper.SendEmail(model.Username, "Email confirmation", $"<h1>Email Confirmation</h1>" +
-                        $"To allow the user, " +
-                        $"plase click in this link:</br></br><a href = \"{tokenLink}\">Confirm Email</a>");
+                    Response response = _mailHelper.SendEmail(
+                        model.Username,
+                        "Confirmação de E-mail",
+                        mensagem // Corpo do e-mail com HTML formatado
+                    );
 
                     if (response.IsSuccess)
                     {
-                        ViewBag.Message = "The instructions to allow you user has been sent to email";
+                        ViewBag.Message = "Utilizador registado com sucesso. Foi enviado em email de confirmação para o email do utilizador " + model.Username;
                         return View(model);
                     }
 
@@ -418,5 +435,3 @@ namespace AguasSetubal.Controllers
 
     }
 }
-
-

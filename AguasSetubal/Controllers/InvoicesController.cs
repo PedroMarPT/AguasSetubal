@@ -13,6 +13,9 @@ using Microsoft.CodeAnalysis.CSharp;
 using static Fable.Core.JS;
 using System.Runtime.Serialization;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json;
+using static Humanizer.On;
 
 namespace AguasSetubal.Controllers
 {
@@ -21,12 +24,14 @@ namespace AguasSetubal.Controllers
         private readonly IInvoicesRepository _invoicesRepository;
         private readonly ApplicationDbContext _context;
         private readonly IUserHelper _userHelper;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public InvoicesController(ApplicationDbContext context, IInvoicesRepository invoicesRepository, IUserHelper userHelper)
+        public InvoicesController(ApplicationDbContext context, IInvoicesRepository invoicesRepository, IUserHelper userHelper, IHttpClientFactory httpClientFactory)
         {
             _context = context;
             _invoicesRepository = invoicesRepository;
             _userHelper = userHelper;
+            _httpClientFactory = httpClientFactory;
         }
 
 
@@ -147,7 +152,28 @@ namespace AguasSetubal.Controllers
                     }
                     await _context.SaveChangesAsync();
 
-                    return RedirectToAction(nameof(Index));
+                    // Após criar a fatura, chamamos a API
+                    // Faz uma requisição GET para a API local (sem parâmetros)
+                    // Após criar a fatura, você chama a API local sem parâmetros
+                    var httpClient = _httpClientFactory.CreateClient();
+
+                    // URL da API local (endereço relativo)
+                    var apiUrl = "https://localhost:44358/api/Invoices/SendLastInvoice"; // Endpoint da API local sem parâmetros
+
+                    var response = await httpClient.GetAsync(apiUrl);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // API chamada com sucesso, pode processar o retorno, se necessário.
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        // Se a API falhar, lide com o erro adequadamente.
+                        ModelState.AddModelError("", "Erro ao chamar API.");
+                        return View(fatura);
+                    }
+
                 }
                 catch (Exception ex)
                 {
@@ -321,18 +347,3 @@ namespace AguasSetubal.Controllers
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

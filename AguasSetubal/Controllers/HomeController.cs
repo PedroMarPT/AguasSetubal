@@ -25,6 +25,9 @@ namespace AguasSetubal.Controllers
             var listCounters = _context.RequisicaoContador.Where(r => r.IsValid == false).ToList();
             ViewBag.NewCounters = listCounters.Any() ? listCounters.Count().ToString() : null;
 
+            var listCountersAdmin = _context.RequisicaoContador.Where(r => r.IsValid == true && r.IsRequested == false).ToList();
+            ViewBag.NewCountersAdmin = listCountersAdmin.Any() ? listCountersAdmin.Count().ToString() : null;
+
             return View();
         }
 

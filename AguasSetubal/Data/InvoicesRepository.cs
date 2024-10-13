@@ -16,8 +16,11 @@ namespace AguasSetubal.Data
         public Fatura GetLastInvoice()
         {
             return _context.Faturas
-                .OrderBy(f => f.Id)
-                .LastOrDefault();
+                .Include(f => f.Cliente)
+                .OrderByDescending(f => f.Id)
+                .FirstOrDefault();
+
+
         }
 
     }

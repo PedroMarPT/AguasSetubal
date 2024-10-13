@@ -53,11 +53,6 @@
                             <input asp-for="ContactoTelefonico" class="form-control" />
                             <span asp-validation-for="ContactoTelefonico" class="text-danger"></span>
                         </div>
-                        <div class="form-group">
-                            <label asp-for="UserId" class="control-label">Selecione o utlizador que irá gerir o cliente</label>
-                            <select asp-for="UserId" class="form-control" asp-items="ViewBag.Utilizadores"></select>
-                            <span asp-validation-for="UserId" class="text-danger"></span>
-                        </div>
                         <!-- Botão de Submissão -->
                         <div class="form-group">
                             <input type="submit" value="Criar" class="btn btn-primary btn-lg" />
