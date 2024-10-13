@@ -1,4 +1,5 @@
 ﻿using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
@@ -11,13 +12,13 @@ namespace AguasSetubal.Helpers
 {
     public class MailHelper : IMailHelper
     {
-
         private readonly IConfiguration _configuration;
 
         public MailHelper(IConfiguration configuration)
         {
             _configuration = configuration;
         }
+
 
         public Response SendEmail(string to, string subject, string body)
         {
@@ -27,6 +28,7 @@ namespace AguasSetubal.Helpers
             var smtp = _configuration["Mail:Smtp"];
             var port = _configuration["Mail:Port"];
             var password = _configuration["Mail:Password"];
+
 
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(nameFrom, from));
@@ -43,28 +45,29 @@ namespace AguasSetubal.Helpers
             {
                 using (var client = new SmtpClient())
                 {
-                    client.Connect(smtp, int.Parse(port), false);
+                    client.Connect("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
                     client.Authenticate(from, password);
-                    client.Send((MimeMessage)message);
+                    client.Send(message);
                     client.Disconnect(true);
                 }
             }
-            //try
-            //{
-            //    using (var client = new System.Net.Mail.SmtpClient(smtp, int.Parse(port)))
-            //    {
-            //        client.UseDefaultCredentials = false;
-            //        client.Credentials = new NetworkCredential(from, password);
-            //        client.EnableSsl = false;
-            //        client.Send(message);
-            //    }
-            //}
             catch (Exception ex)
             {
-                return new Response { IsSuccess = false, Message = ex.ToString() };
+
+                return new Response
+                {
+                    IsSuccess = false,
+                    Message = ex.ToString()
+
+                };
             }
 
-            return new Response { IsSuccess = true };
+            return new Response
+            {
+                IsSuccess = true
+            };
+
         }
     }
 }
+

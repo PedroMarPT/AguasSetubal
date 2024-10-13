@@ -3,6 +3,7 @@ using AguasSetubal.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace AguasSetubal.Helpers
@@ -16,6 +17,8 @@ namespace AguasSetubal.Helpers
         Task<SignInResult> LoginAsync(LoginViewModel model);
 
         Task LogoutAsync();
+
+        Task AddUserClaimAsync(User user, Claim claim);
 
         Task<IdentityResult> UpdateUserAsync(User user);
 
@@ -42,5 +45,7 @@ namespace AguasSetubal.Helpers
         Task<IList<User>> GetUsersWithRoleClienteAsync();
 
         Task<User> GetUserByNameAsync(string name);
+
+        Task<IList<Claim>> GetUserClaimsAsync(User user);
     }
 }

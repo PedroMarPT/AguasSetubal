@@ -13,7 +13,7 @@ namespace AguasSetubal.Models.ViewModels
         public string NewPassword { get; set; }
 
         [Required]
-        [Compare("New Password")]
+        [Compare("NewPassword")]
         public string Confirm { get; set; }
 
     }

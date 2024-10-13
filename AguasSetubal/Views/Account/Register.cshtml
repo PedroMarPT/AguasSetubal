@@ -3,82 +3,88 @@
 @{
     ViewData["Title"] = "Registar Conta";
 }
-<div class="container-fluid mt-4">
-    <div class="row">
-        <div class="col-md-5 offset-md-4">
-            <div class="card shadow-lg mt-3 scroll">
-                <div class="card-body">
-                    @if (ViewBag.Message != null)
-                    {
-                        <div class="alert alert-success" role="alert">
-                            @ViewBag.Message
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card shadow-lg mt-3">
+            <div class="card-body">
+                @if (ViewBag.Message != null)
+                {
+                    <div class="alert alert-success" role="alert">
+                        @ViewBag.Message
+                    </div>
+                }
+                else
+                {
+                    <h2 class="display-4 text-primary">@ViewData["Title"]</h2>
+                    <form method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly"></div>
+                        <div class="form-group">
+                            <label asp-for="FirstName">Nome</label>
+                            <input asp-for="FirstName" class="form-control" />
+                            <span asp-validation-for="FirstName" class="text-warning"></span>
                         </div>
-                    }
-                    else
-                    {
-                        <h2 class="display-4 text-primary">@ViewData["Title"]</h2>
-                        <form method="post">
-                            <div asp-validation-summary="ModelOnly"></div>
-                            <div class="form-group">
-                                <label asp-for="FirstName">Nome</label>
-                                <input asp-for="FirstName" class="form-control" />
-                                <span asp-validation-for="FirstName" class="text-warning"></span>
-                            </div>
 
-                            <div class="form-group">
-                                <label asp-for="LastName">Apelido</label>
-                                <input asp-for="LastName" class="form-control" />
-                                <span asp-validation-for="LastName" class="text-warning"></span>
-                            </div>
+                        <div class="form-group">
+                            <label asp-for="LastName">Apelido</label>
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-warning"></span>
+                        </div>
 
-                            <div class="form-group">
-                                <label asp-for="Username">Email</label>
-                                <input asp-for="Username" class="form-control" />
-                                <span asp-validation-for="Username" class="text-warning"></span>
-                            </div>
+                        <div class="form-group">
+                            <label asp-for="ImageFile" class="control-label"></label>
+                            <input asp-for="ImageFile" class="form-control" type="file" />
+                            <span asp-validation-for="ImageFile" class="text-danger"></span>
+                        </div>
 
-                            <div class="form-group">
-                                <label asp-for="Address">Morada</label>
-                                <input asp-for="Address" class="form-control" />
-                                <span asp-validation-for="Address" class="text-warning"></span>
-                            </div>
+                        <div class="form-group">
+                            <label asp-for="Username">Email</label>
+                            <input asp-for="Username" class="form-control" />
+                            <span asp-validation-for="Username" class="text-warning"></span>
+                        </div>
 
-                            <div class="form-group">
-                                <label asp-for="PhoneNumber">Contato</label>
-                                <input asp-for="PhoneNumber" class="form-control" />
-                                <span asp-validation-for="PhoneNumber" class="text-warning"></span>
-                            </div>
+                        <div class="form-group">
+                            <label asp-for="Address">Morada</label>
+                            <input asp-for="Address" class="form-control" />
+                            <span asp-validation-for="Address" class="text-warning"></span>
+                        </div>
 
-                            <div class="form-group">
-                                <label asp-for="Password">Password</label>
-                                <input asp-for="Password" type="password" class="form-control" />
-                                <span asp-validation-for="Password" class="text-warning"></span>
-                            </div>
+                        <div class="form-group">
+                            <label asp-for="PhoneNumber">Contato</label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-warning"></span>
+                        </div>
 
-                            <div class="form-group">
-                                <label asp-for="Confirm">Confirme a password</label>
-                                <input asp-for="Confirm" type="password" class="form-control" />
-                                <span asp-validation-for="Confirm" class="text-warning"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="SelectedOption">Selecione a role a atribuir ao utilizador</label>
-                                @Html.DropDownListFor(m => m.SelectedOption, new SelectList(Model.Roles))
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="ClientId" class="control-label">Selecione o cliente que o user irá gerir (aplicável à role Cliente)</label>
-                                <select asp-for="ClientId" class="form-control" asp-items="ViewBag.Clientes"></select>
-                                <span asp-validation-for="ClientId" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <input type="submit" value="Register New User" class="btn btn-primary" />
-                            </div>
-                        </form>
-                    }
-                </div>
+                        <div class="form-group">
+                            <label asp-for="Password">Password</label>
+                            <input asp-for="Password" type="password" class="form-control" />
+                            <span asp-validation-for="Password" class="text-warning"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Confirm">Confirme a password</label>
+                            <input asp-for="Confirm" type="password" class="form-control" />
+                            <span asp-validation-for="Confirm" class="text-warning"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="SelectedOption">Selecione a role a atribuir ao utilizador</label>
+                            @Html.DropDownListFor(m => m.SelectedOption, new SelectList(Model.Roles))
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="ClientId" class="control-label">Selecione o cliente que o user irá gerir (aplicável à role Cliente)</label>
+                            <select asp-for="ClientId" class="form-control" asp-items="ViewBag.Clientes"></select>
+                            <span asp-validation-for="ClientId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" value="Register New User" class="btn btn-primary" />
+                        </div>
+                    </form>
+                }
             </div>
         </div>
     </div>
 </div>
+
 
 
 @section Scripts {
@@ -87,58 +93,4 @@
     }
 }
 
-<style>
-    .container {
-        max-width: 100%;
-        padding: 0 15px;
-    }
-
-    .card {
-        width: 100%;
-    }
-
-    .card-body {
-        padding: 20px;
-    }
-
-    .display-4 {
-        color: #0056b3;
-    }
-
-    .form-group label {
-        font-weight: bold;
-    }
-
-    .form-control {
-        border-radius: 5px;
-    }
-
-    .btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
-    }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
-        }
-
-    .text-danger {
-        font-size: 0.9em;
-    }
-</style>
-    .btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
-    }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
-        }
-
-    .text-danger {
-        font-size: 0.9em;
-    }
-</style>
 

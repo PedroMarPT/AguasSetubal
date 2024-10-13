@@ -1,9 +1,12 @@
-﻿<ul class="navbar-nav">
+﻿
+
+<ul class="navbar-nav">
     @if (this.User.Identity.IsAuthenticated)
     {
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-Action="/Account/Manage/Index" title="Manage">Hello @User.Identity.Name!</a>
+            <a class="nav-link text-dark" title="Manage">Olá @User.Identity.Name! </a>
         </li>
+
         <li class="nav-item">
             <form class="form-inline" asp-controller="Account" asp-action="Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                 <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
@@ -25,7 +28,11 @@
                 </span>
             </li>
         }
-
+        <li class="nav-item">
+            <div class="profile-photo">
+                <img src="@Url.Content(@User.FindFirst("ImageUrl")?.Value)" alt="Profile Photo" class="img-thumbnail" style="width: 95px; height: 95px;" />
+            </div>
+        </li>
     }
     else
     {

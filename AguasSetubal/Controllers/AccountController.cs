@@ -21,6 +21,8 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AguasSetubal.Data;
+using System.Net;
+using System.IO;
 
 
 namespace AguasSetubal.Controllers
@@ -61,6 +63,15 @@ namespace AguasSetubal.Controllers
 
                 if (result.Succeeded)
                 {
+                    var user = await _userHelper.GetUserByEmailAsync(model.Username);
+
+                    // Add ImageUrl claim if it's not already present
+                    var claims = await _userHelper.GetUserClaimsAsync(user);
+                    if (!claims.Any(c => c.Type == "ImageUrl") && user.ImageUrl != null && user.ImageUrl != string.Empty)
+                    {
+                        await _userHelper.AddUserClaimAsync(user, new Claim("ImageUrl", user.ImageUrl));
+                    }
+
                     if (this.Request.Query.Keys.Contains("ReturnUrl"))
                     {
                         return Redirect(this.Request.Query["ReturnUrl"].First());
@@ -81,6 +92,8 @@ namespace AguasSetubal.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [Authorize]
+        [Authorize(Roles = "Admin")]
         public IActionResult Register()
         {
             var model = new RegisterNewUserViewModel();
@@ -95,12 +108,31 @@ namespace AguasSetubal.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterNewUserViewModel model)
         {
+            model.Roles = new List<string> { "Admin", "Cliente", "Funcionario" };
+            ViewBag.Clientes = new SelectList(_clientsRepository.GetAll(), "Id", "Nome");
+
             if (ModelState.IsValid)
             {
                 var user = await _userHelper.GetUserByEmailAsync(model.Username);
-
                 if (user == null)
                 {
+                    var path = string.Empty;
+
+                    if (model.ImageFile != null && model.ImageFile.Length > 0)
+                    {
+                        var guid = Guid.NewGuid().ToString();
+                        var file = $"{guid}.jpg";
+                        path = Path.Combine(
+                            Directory.GetCurrentDirectory(),
+                            "wwwroot\\img\\Users",
+                            file);
+                        using (var stream = new FileStream(path, FileMode.Create))
+                        {
+                            await model.ImageFile.CopyToAsync(stream);
+                        }
+                        path = $"~/img/Users/{file}";
+                    }
+
                     user = new User
                     {
                         FirstName = model.FirstName,
@@ -109,52 +141,51 @@ namespace AguasSetubal.Controllers
                         UserName = model.Username,
                         Address = model.Address,
                         PhoneNumber = model.PhoneNumber,
+                        ImageUrl = path
                     };
 
                     var result = await _userHelper.AddUserAsync(user, model.Password);
-
                     if (result != IdentityResult.Success)
                     {
-                        ModelState.AddModelError(string.Empty, "The user couldn't be created");
+                        ModelState.AddModelError(string.Empty, "The user couldn't be created.");
                         return View(model);
                     }
+                    await _userHelper.AddUserToRoleAsync(user, model.SelectedOption);
+
+                    var userRegistered = await _userHelper.GetUserByEmailAsync(model.Username);
 
                     //Se a role do utilizador novo é cliente então temos de associar o user criado ao cliente
                     if (model.SelectedOption == "Cliente" && model.ClientId.HasValue)
                     {
-                        var userRegistered = await _userHelper.GetUserByEmailAsync(model.Username);
                         var clientToUpdate = await _clientsRepository.GetByIdAsync(model.ClientId.Value);
                         clientToUpdate.UserId = userRegistered.Id;
                         await _clientsRepository.UpdateAsync(clientToUpdate);
                     }
 
-                    await _userHelper.AddUserToRoleAsync(user, model.SelectedOption);
+                    // Add the "ImageUrl" claim after user creation
+                    await _userHelper.AddUserClaimAsync(userRegistered, new Claim("ImageUrl", path));
 
                     string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
-                    await _userHelper.ConfirmEmailAsync(user, myToken);
 
-                    //string tokenLink = Url.Action("ConfirmEmail", "Account", new
-                    //{
-                    //    userId = user.Id,
-                    //    token = myToken,
+                    string tokenLink = Url.Action("ConfirmEmail", "Account", new
+                    {
+                        userId = user.Id,
+                        token = myToken
+                    }, protocol: HttpContext.Request.Scheme);
 
-                    //}, protocol: HttpContext.Request.Scheme);
 
-                    //Response response = _mailHelper.SendEmail(model.Username, "Email confirmation", $"<h1>Email confirmation</h1>" +
-                    //        $"To allow the user," +
-                    //        $"please click on this link:</br></br><a href= \"{tokenLink}\">Confirm Email</a>");
+                    Response response = _mailHelper.SendEmail(model.Username, "Email confirmation", $"<h1>Email Confirmation</h1>" +
+                        $"To allow the user, " +
+                        $"plase click in this link:</br></br><a href = \"{tokenLink}\">Confirm Email</a>");
 
-                    //if (response.IsSuccess)
-                    //{
-                    //    ViewBag.Message = "The instructions to grant access to your user have been sent to your email";
+                    if (response.IsSuccess)
+                    {
+                        ViewBag.Message = "The instructions to allow you user has been sent to email";
+                        return View(model);
+                    }
 
-                    //    return View(model);
-                    //}
-                    ViewBag.Message = "Utilizador registado com sucesso";
-                    ViewBag.Clientes = new SelectList(_clientsRepository.GetAll(), "Id", "Nome");
-                    model.Roles = new List<string> { "Admin", "Cliente", "Funcionario" };
-                    return View(model);
-                    //ModelState.AddModelError(string.Empty, "The user couldn't be logged in.");
+                    ModelState.AddModelError(string.Empty, "The user couldn't be logged.");
+
                 }
             }
 
@@ -287,6 +318,9 @@ namespace AguasSetubal.Controllers
             return BadRequest();
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("Account/ConfirmEmail")]
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
@@ -295,20 +329,19 @@ namespace AguasSetubal.Controllers
             }
 
             var user = await _userHelper.GetUserByIdAsync(userId);
-
             if (user == null)
             {
                 return NotFound();
             }
 
             var result = await _userHelper.ConfirmEmailAsync(user, token);
-
             if (!result.Succeeded)
             {
-                return NotFound();
+
             }
 
             return View();
+
         }
 
         public IActionResult RecoverPassword()
@@ -385,3 +418,5 @@ namespace AguasSetubal.Controllers
 
     }
 }
+
+

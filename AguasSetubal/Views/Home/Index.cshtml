@@ -2,37 +2,6 @@
     ViewData["Title"] = "Página Inicial";
 }
 
-<style>
-    body {
-        background-color: #f0f8ff; /* Cor de fundo suave */
-    }
-
-    .card {
-        height: 100%; /* Garante que os cartões tenham o mesmo tamanho */
-        border-radius: 10px; /* Bordas arredondadas */
-    }
-
-    .card-body {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between; /* Espaçamento uniforme */
-    }
-
-    .btn-outline-primary {
-        border-radius: 20px; /* Bordas arredondadas dos botões */
-        transition: background-color 0.3s ease; /* Transição suave */
-    }
-
-        .btn-outline-primary:hover {
-            background-color: #0056b3; /* Cor ao passar o mouse */
-            color: #fff;
-        }
-
-    .card-title i {
-        color: #0056b3;
-        margin-right: 8px;
-    }
-</style>
 
 <div class="text-center mt-4">
     <h1 class="display-4 text-primary">Bem-vindo ao Sistema de Gestão de Águas de Setúbal</h1>
@@ -96,7 +65,7 @@
             @if (this.User.IsInRole("Cliente"))
             {
                 <!-- Card para Gerir Faturas -->
-                <div class="col-md-4 mb-4 d-flex">
+                <div class="col-md-3 mb-3 d-flex">
                     <div class="card shadow-sm">
                         <div class="card-body">
                             <h5 class="card-title text-secondary">
@@ -105,6 +74,32 @@
                             </h5>
                             <p class="card-text">Aceda ao módulo de faturas para criar, editar ou visualizar faturas.</p>
                             <a href="/Invoices?id=@this.User.Identity.Name" class="btn btn-outline-primary btn-block mt-auto">Ir para Faturas</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card para Gerir Consumos -->
+                <div class="col-md-3 mb-3 d-flex">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title text-secondary">
+                                <i class="fa fa-calculator"></i> <!-- Ícone de Consumos -->
+                                Gerir Consumos
+                            </h5>
+                            <p class="card-text">Aceda ao módulo de gestão de consumos para criar, editar ou visualizar.</p>
+                            <a href="/LeituraContador?id=@this.User.Identity.Name" class="btn btn-outline-primary btn-block mt-auto">Ir para Leituras</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card para Utlizadores anónimos -->
+                <div class="col-md-3 mb-3 d-flex">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title text-secondary">
+                                <i class="fas fa-users"></i>
+                                Contadores
+                            </h5>
+                            <p class="card-text">Solicitar pedido para novos contadores.</p>
+                            <a href="/RequisicaoContador/Create" class="btn btn-outline-primary btn-block mt-auto">Efetuar pedido</a>
                         </div>
                     </div>
                 </div>
@@ -121,6 +116,19 @@
                             </h5>
                             <p class="card-text">Aceda ao módulo de clientes para criar, editar ou visualizar informações dos clientes.</p>
                             <a href="/Clients" class="btn btn-outline-primary btn-block mt-auto">Ir para Clientes</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card para Gerir escalões de consumos -->
+                <div class="col-md-4 mb-4 d-flex">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title text-secondary">
+                                <i class="fas fa-calculator"></i> <!-- Ícone de escalões de consumos -->
+                                Gerir escalões de consumos
+                            </h5>
+                            <p class="card-text">Aceda ao módulo de gestão de escalões de consumos para criar, editar ou visualizar informações dos escalões.</p>
+                            <a href="/TabelaPrecos" class="btn btn-outline-primary btn-block mt-auto">Ir para Escalões</a>
                         </div>
                     </div>
                 </div>
@@ -154,3 +162,6 @@
         </div>
     }
 </div>
+
+
+

@@ -1,0 +1,17 @@
+﻿@model AguasSetubal.Models.ViewModels.ChangeUserViewModel
+
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="alert alert-success" role="alert">
+            Password alterada com sucesso!
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

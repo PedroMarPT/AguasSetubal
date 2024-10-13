@@ -1,9 +1,9 @@
-﻿@model AguasSetubal.Models.LeituraContador
+﻿@model AguasSetubal.Models.ViewModels.LeituraContadorViewModel
 
 <div class="container-fluid mt-4">
     <div class="row">
         <div class="col-md-8 offset-md-2">
-            <div class="card shadow-lg mt-3 scroll">
+            <div class="card shadow-lg mt-3">
                 <div class="card-body">
                     <h4>Registar nova leitura do contador</h4>
                     <hr />
@@ -11,6 +11,7 @@
                         <div class="col-md-8">
                             <form asp-action="Create">
                                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                @Html.HiddenFor(x => x.UserId)
                                 <div class="form-group">
                                     <label asp-for="ClienteId" class="control-label">Selecione o cliente</label>
                                     <select asp-for="ClienteId" class="form-control" asp-items="ViewBag.Clientes"></select>
@@ -44,7 +45,14 @@
 
                                 <div class="form-group">
                                     <input type="submit" value="Create" class="btn btn-primary" />
-                                    <a asp-action="Index">Back to List</a>
+                                    @if (this.User.IsInRole("Funcionario"))
+                                    {
+                                        <a asp-action="Index">Back to List</a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="Index" asp-route-id="@this.User.Identity.Name">Back to List</a>
+                                    }
                                 </div>
                             </form>
                         </div>
@@ -63,10 +71,16 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
 <script>
     $(document).ready(function () {
+
+        // Set moment.js locale to pt
+        moment.locale('pt');
 
         $('#createLeituraDiv #ClienteId').on('change', function (e) {
             GetCountersByClientId($(this).val());
@@ -81,9 +95,9 @@
         $('#createLeituraDiv #LeituraAtual').on('change', function (e) {
 
             var consumo = parseFloat($('#LeituraAtual').val()) - parseFloat($('#LeituraAnterior').val());
-            if(consumo > 0){
+            if (consumo > 0) {
                 $('#Consumo').val(consumo);
-            }else{
+            } else {
                 $('#LeituraAtual').val('');
             }
         });
@@ -124,7 +138,9 @@
                 }
             });
         }
-
     });
 
+
+
 </script>
+

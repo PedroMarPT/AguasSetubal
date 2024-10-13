@@ -2,7 +2,9 @@
 
 namespace AguasSetubal.Data
 {
+
     public interface IInvoicesRepository : IGenericRepository<Fatura>
     {
+        Fatura GetLastInvoice();
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AguasSetubal.Data;
 using AguasSetubal.Models;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace AguasSetubal.Controllers
@@ -20,13 +21,18 @@ namespace AguasSetubal.Controllers
             _context = context;
         }
 
+
         // GET: TabelaPrecos
+        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.TabelaPrecos.ToListAsync());
         }
 
         // GET: TabelaPrecos/Details/5
+        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -45,6 +51,8 @@ namespace AguasSetubal.Controllers
         }
 
         // GET: TabelaPrecos/Create
+        [Authorize]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -53,6 +61,8 @@ namespace AguasSetubal.Controllers
         // POST: TabelaPrecos/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TabelaPrecos tabelaPrecos)
@@ -67,6 +77,8 @@ namespace AguasSetubal.Controllers
         }
 
         // GET: TabelaPrecos/Edit/5
+        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -85,6 +97,8 @@ namespace AguasSetubal.Controllers
         // POST: TabelaPrecos/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, TabelaPrecos tabelaPrecos)
@@ -118,6 +132,8 @@ namespace AguasSetubal.Controllers
         }
 
         // GET: TabelaPrecos/Delete/5
+        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -136,6 +152,8 @@ namespace AguasSetubal.Controllers
         }
 
         // POST: TabelaPrecos/Delete/5
+        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

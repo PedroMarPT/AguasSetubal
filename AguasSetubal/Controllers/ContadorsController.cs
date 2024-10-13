@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AguasSetubal.Data;
 using AguasSetubal.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AguasSetubal.Controllers
 {
@@ -20,6 +21,8 @@ namespace AguasSetubal.Controllers
         }
 
         // GET: Contadors
+        [Authorize]
+        [Authorize(Roles = "Funcionario")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Contador.Include(c => c.Cliente);
@@ -27,6 +30,8 @@ namespace AguasSetubal.Controllers
         }
 
         // GET: Contadors/Details/5
+        [Authorize]
+        [Authorize(Roles = "Funcionario")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -46,6 +51,8 @@ namespace AguasSetubal.Controllers
         }
 
         // GET: Contadors/Create
+        [Authorize]
+        [Authorize(Roles = "Funcionario")]
         public IActionResult Create()
         {
             ViewBag.Clientes = new SelectList(_context.Clientes, "Id", "Nome");
@@ -55,6 +62,8 @@ namespace AguasSetubal.Controllers
         // POST: Contadors/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
+        [Authorize(Roles = "Funcionario")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Contador contador)
@@ -70,6 +79,8 @@ namespace AguasSetubal.Controllers
         }
 
         // GET: Contadors/Edit/5
+        [Authorize]
+        [Authorize(Roles = "Funcionario")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -89,6 +100,8 @@ namespace AguasSetubal.Controllers
         // POST: Contadors/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
+        [Authorize(Roles = "Funcionario")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Contador contador)
@@ -123,6 +136,8 @@ namespace AguasSetubal.Controllers
         }
 
         // GET: Contadors/Delete/5
+        [Authorize]
+        [Authorize(Roles = "Funcionario")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -142,6 +157,8 @@ namespace AguasSetubal.Controllers
         }
 
         // POST: Contadors/Delete/5
+        [Authorize]
+        [Authorize(Roles = "Funcionario")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

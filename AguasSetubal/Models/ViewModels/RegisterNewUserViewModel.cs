@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -38,5 +39,7 @@ namespace AguasSetubal.Models.ViewModels
 
         public int? ClientId { get; set; }
 
+        [Display(Name = "Imagem")]
+        public IFormFile ImageFile { get; set; }
     }
 }

@@ -3,7 +3,7 @@
 <div class="container-fluid mt-4">
     <div class="row">
         <div class="col-md-8 offset-md-2">
-            <div class="card shadow-lg mt-3 scroll">
+            <div class="card shadow-lg mt-3">
                 <div class="card-body">
                     <h4>Detalhes da fatura</h4>
                     <hr />
@@ -39,7 +39,14 @@
                         <a href="@Url.Action("ImprimirFatura", new { id = Model.Id })" target="_blank" class="btn btn-success btn-lg">
                             Imprimir
                         </a>
-                        <a asp-action="Index">Back to List</a>
+                        @if (this.User.IsInRole("Funcionario"))
+                        {
+                            <a asp-action="Index">Back to List</a>
+                        }
+                        else
+                        {
+                            <a asp-action="Index" asp-route-id="@this.User.Identity.Name">Back to List</a>
+                        }
                     </div>
                 </div>
             </div>

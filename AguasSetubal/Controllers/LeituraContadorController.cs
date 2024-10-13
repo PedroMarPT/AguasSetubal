@@ -7,23 +7,44 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AguasSetubal.Data;
 using AguasSetubal.Models;
+using AguasSetubal.Helpers;
+using AguasSetubal.Models.ViewModels;
 
 namespace AguasSetubal.Controllers
 {
     public class LeituraContadorController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IUserHelper _userHelper;
 
-        public LeituraContadorController(ApplicationDbContext context)
+        public LeituraContadorController(ApplicationDbContext context, IUserHelper userHelper)
         {
             _context = context;
+            _userHelper = userHelper;
         }
 
         // GET: LeituraContadors
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string id)
         {
-            var applicationDbContext = _context.LeituraContadores.Include(l => l.Contador).Include(l => l.Cliente);
-            return View(await applicationDbContext.ToListAsync());
+            var listaLeituras = _context.LeituraContadores
+                .Include(l => l.Contador)
+                .Include(l => l.Cliente);
+
+            if (id != null && listaLeituras != null && listaLeituras.Any())
+            {
+                var userId = await _userHelper.GetUserByNameAsync(id);
+
+                var clientId = _context.Clientes.FirstOrDefault(c => c.UserId == userId.Id)?.Id;
+
+                var listaLeiturasPorCliente = _context.LeituraContadores
+                .Include(f => f.Cliente)
+                .Include(f => f.Contador)
+                .Where(c => c.ClienteId == clientId);
+
+                return View(await listaLeiturasPorCliente.ToListAsync());
+            }
+
+            return View(await listaLeituras.ToListAsync());
         }
 
         // GET: LeituraContadors/Details/5
@@ -47,12 +68,24 @@ namespace AguasSetubal.Controllers
         }
 
         // GET: LeituraContadors/Create
-        public IActionResult Create()
+        public async Task<IActionResult> CreateAsync(string id)
         {
-            LeituraContador novaLeitura = new LeituraContador();
+            LeituraContadorViewModel novaLeitura = new LeituraContadorViewModel();
             novaLeitura.DataLeitura = DateTime.Now;
 
-            ViewBag.Clientes = new SelectList(_context.Clientes, "Id", "Nome");
+            var clientes = _context.Clientes;
+            ViewBag.Clientes = new SelectList(clientes, "Id", "Nome");
+
+            if (id != null)
+            {
+                var user = await _userHelper.GetUserByNameAsync(id);
+
+                var clientesPorId = _context.Clientes
+                  .Where(c => c.UserId == user.Id && c.UserId != null).ToList();
+
+                ViewBag.Clientes = new SelectList(clientesPorId, "Id", "Nome");
+                novaLeitura.UserId = id;
+            }
 
             return View(novaLeitura);
         }
@@ -62,17 +95,35 @@ namespace AguasSetubal.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(LeituraContador leituraContador)
+        public async Task<IActionResult> Create(LeituraContadorViewModel leituraContadorVM)
         {
             if (ModelState.IsValid)
             {
+                var leituraContador = new LeituraContador
+                {
+                    LeituraAnterior = leituraContadorVM.LeituraAnterior,
+                    LeituraAtual = leituraContadorVM.LeituraAtual,
+                    Consumo = leituraContadorVM.Consumo,
+                    DataLeitura = leituraContadorVM.DataLeitura,
+                    IsInvoiced = leituraContadorVM.IsInvoiced,
+                    ClienteId = leituraContadorVM.ClienteId,
+                    FaturaId = leituraContadorVM.FaturaId,
+                    ContadorId = leituraContadorVM.ContadorId
+                };
+
                 _context.Add(leituraContador);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+
+                if (leituraContadorVM.UserId == string.Empty)
+                    return RedirectToAction(nameof(Index));
+                else
+                    return RedirectToAction(nameof(Index), new { id = leituraContadorVM.UserId });
             }
-            ViewData["ContadorId"] = new SelectList(_context.Contador, "Id", "Id", leituraContador.ContadorId);
-            ViewData["FaturaId"] = new SelectList(_context.Faturas, "Id", "Id", leituraContador.FaturaId);
-            return View(leituraContador);
+
+            ViewData["ContadorId"] = new SelectList(_context.Contador, "Id", "Id", leituraContadorVM.ContadorId);
+            ViewData["FaturaId"] = new SelectList(_context.Faturas, "Id", "Id", leituraContadorVM.FaturaId);
+
+            return View(leituraContadorVM);
         }
 
         // GET: LeituraContadors/Edit/5

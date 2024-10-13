@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.Web.CodeGenerators.Mvc;
 using Microsoft.CodeAnalysis.CSharp;
 using static Fable.Core.JS;
 using System.Runtime.Serialization;
+using System.Collections.Generic;
 
 namespace AguasSetubal.Controllers
 {
@@ -36,23 +37,33 @@ namespace AguasSetubal.Controllers
                 .Include(f => f.Cliente)
                 .Include(f => f.LeiturasContador);
 
-            if (id != null && listaFaturas.Any())
+            if (id != null && listaFaturas != null && listaFaturas.Any())
             {
                 var userId = await _userHelper.GetUserByNameAsync(id);
 
-                var clientId = _context.Clientes.FirstOrDefault(c => c.UserId == userId.Id).Id;
+                var clientId = _context.Clientes.FirstOrDefault(c => c.UserId == userId.Id)?.Id;
 
-                var listaFaturasPorCliente = _context.Faturas
-                .Include(f => f.Cliente)
-                .Include(f => f.LeiturasContador)
-                .Where(c => c.ClienteId == clientId);
+                if (clientId != null)
+                {
+                    var listaFaturasPorCliente = _context.Faturas
+                    .Include(f => f.Cliente)
+                    .Include(f => f.LeiturasContador)
+                    .Where(c => c.ClienteId == clientId);
 
-                return View(await listaFaturasPorCliente.ToListAsync());
+                    return View(await listaFaturasPorCliente.ToListAsync());
+                }
+                else
+                {
+                    var lista = new List<Fatura>();
+                    return View(lista);
+                }
             }
 
             return View(await listaFaturas.ToListAsync());
         }
 
+        [Authorize]
+        [Authorize(Roles = "Funcionario")]
         // GET: Faturas/Create
         public IActionResult Create()
         {
@@ -66,6 +77,8 @@ namespace AguasSetubal.Controllers
         }
 
         // POST: Faturas/Create
+        [Authorize]
+        [Authorize(Roles = "Funcionario")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Fatura fatura)
@@ -149,6 +162,8 @@ namespace AguasSetubal.Controllers
 
 
         // GET: Faturas/Edit/5
+        [Authorize]
+        [Authorize(Roles = "Funcionario")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -171,6 +186,8 @@ namespace AguasSetubal.Controllers
 
 
         // POST: Faturas/Edit/5
+        [Authorize]
+        [Authorize(Roles = "Funcionario")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Fatura fatura)
@@ -258,6 +275,8 @@ namespace AguasSetubal.Controllers
         }
 
         // POST: Faturas/Delete/5
+        [Authorize]
+        [Authorize(Roles = "Funcionario")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -302,3 +321,18 @@ namespace AguasSetubal.Controllers
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

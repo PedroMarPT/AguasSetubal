@@ -1,54 +1,50 @@
 ﻿@model AguasSetubal.Models.RequisicaoContador
 
-@{
-    ViewData["Title"] = "Create";
-}
-<div class="container-fluid mt-4">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card shadow-lg mt-3 scroll">
-                <div class="card-body">
-                    <h4>Criar requisicao contador</h4>
-                    <hr />
-                    <div class="row">
-                        <div class="col-md-10">
-                            <form asp-action="Create">
-                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                <div class="form-group">
-                                    <label asp-for="Nome" class="control-label"></label>
-                                    <input asp-for="Nome" class="form-control" />
-                                    <span asp-validation-for="Nome" class="text-danger"></span>
-                                </div>
-                                <div class="form-group">
-                                    <label asp-for="Morada" class="control-label"></label>
-                                    <input asp-for="Morada" class="form-control" />
-                                    <span asp-validation-for="Morada" class="text-danger"></span>
-                                </div>
-                                <div class="form-group">
-                                    <label asp-for="Contato" class="control-label"></label>
-                                    <input asp-for="Contato" class="form-control" />
-                                    <span asp-validation-for="Contato" class="text-danger"></span>
-                                </div>
-                                <div class="form-group">
-                                    <label asp-for="Email" class="control-label"></label>
-                                    <input asp-for="Email" class="form-control" />
-                                    <span asp-validation-for="Email" class="text-danger"></span>
-                                </div>
-                                <div class="form-group form-check">
-                                    <label class="form-check-label">
-                                        <input class="form-check-input" asp-for="IsResidencial" /> @Html.DisplayNameFor(model => model.IsResidencial)
-                                    </label>
-                                </div>
-                                <div class="form-group form-check">
-                                    <label class="form-check-label">
-                                        <input class="form-check-input" asp-for="IsEmpresarial" /> @Html.DisplayNameFor(model => model.IsEmpresarial)
-                                    </label>
-                                </div>
-                                <div class="form-group">
-                                    <input type="submit" value="Gravar" class="btn btn-primary" />
-                                </div>
-                            </form>
-                        </div>
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card shadow-lg mt-3">
+            <div class="card-body">
+                <h4>Criar requisição contador</h4>
+                <hr />
+                <div class="row">
+                    <div class="col-md-10">
+                        <form asp-action="Create">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <label asp-for="Nome" class="control-label"></label>
+                                <input asp-for="Nome" class="form-control" />
+                                <span asp-validation-for="Nome" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Morada" class="control-label"></label>
+                                <input asp-for="Morada" class="form-control" />
+                                <span asp-validation-for="Morada" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Contato" class="control-label"></label>
+                                <input asp-for="Contato" class="form-control" />
+                                <span asp-validation-for="Contato" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Email" class="control-label"></label>
+                                <input asp-for="Email" class="form-control" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            <div class="form-group form-check">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" asp-for="IsResidencial" /> @Html.DisplayNameFor(model => model.IsResidencial)
+                                </label>
+                            </div>
+                            <div class="form-group form-check">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" asp-for="IsEmpresarial" /> @Html.DisplayNameFor(model => model.IsEmpresarial)
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Gravar" class="btn btn-primary" />
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

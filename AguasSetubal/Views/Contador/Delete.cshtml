@@ -6,7 +6,7 @@
 <div class="container-fluid mt-4">
     <div class="row">
         <div class="col-md-8 offset-md-2">
-            <div class="card shadow-lg mt-3 scroll">
+            <div class="card shadow-lg mt-3">
                 <div class="card-body">
                    <h4>Deseja eliminar o contador?</h4>
         <hr />
@@ -42,7 +42,7 @@
             @Html.DisplayFor(model => model.Cliente.Id)
         </dd class>
     </dl>
-
+    
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
@@ -55,3 +55,4 @@
         </div>
     </div>
 </div>
+

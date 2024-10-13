@@ -1,7 +1,9 @@
 ﻿using AguasSetubal.Models;
 using AguasSetubal.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace AguasSetubal.Helpers
@@ -27,6 +29,11 @@ namespace AguasSetubal.Helpers
         public async Task AddUserToRoleAsync(User user, string roleName)
         {
             await _userManager.AddToRoleAsync(user, roleName);
+        }
+
+        public async Task AddUserClaimAsync(User user, Claim claim)
+        {
+            await _userManager.AddClaimAsync(user, claim);
         }
 
         public async Task<IdentityResult> ChangePasswordAsync(User user, string oldPassword, string newPassword)
@@ -74,7 +81,7 @@ namespace AguasSetubal.Helpers
 
         public async Task<User> GetUserByIdAsync(string userId)
         {
-            return await _userManager.FindByEmailAsync(userId);
+            return await _userManager.FindByIdAsync(userId);
         }
 
         public async Task<bool> IsUserInRoleAsync(User user, string roleName)
@@ -116,5 +123,12 @@ namespace AguasSetubal.Helpers
             return await _userManager.FindByNameAsync(name);
         }
 
+        public async Task<IList<Claim>> GetUserClaimsAsync(User user)
+        {
+
+            // Await the _userHelper.GetClaimsAsync(user) to get the list of claims
+            return await _userManager.GetClaimsAsync(user);
+
+        }
     }
 }
